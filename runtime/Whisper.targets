@@ -1,0 +1,38 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">WINDOWS</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Linux'))">LINUX</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('OSX'))">MACOS</DefineConstants>
+        <IsWindows>$([MSBuild]::IsOSPlatform('Windows'))</IsWindows>
+        <IsLinux>$([MSBuild]::IsOSPlatform('Linux'))</IsLinux>
+        <IsOSX>$([MSBuild]::IsOSPlatform('OSX'))</IsOSX>
+    </PropertyGroup>
+    <ItemGroup Condition="$(TargetFramework.Contains('-windows')) == true ">
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)windows\core\whisper.dll">
+                <Pack>true</Pack>
+                <PackageCopyToOutput>true</PackageCopyToOutput>
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+                <TargetPath>whisper.dll</TargetPath>
+            </None>
+            <None Visible="false" Include="$(MSBuildThisFileDirectory)windows\core\ggml.dll">
+                <Pack>true</Pack>
+                <PackageCopyToOutput>true</PackageCopyToOutput>
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+                <TargetPath>ggml.dll</TargetPath>
+            </None>
+        </ItemGroup>
+    <ItemGroup Condition="$(TargetFramework.Contains('-')) == false AND $(IsWindows)">
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)windows\core\whisper.dll">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>whisper.dll</TargetPath>
+        </None>
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)windows\core\ggml.dll">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>ggml.dll</TargetPath>
+        </None>
+    </ItemGroup>
+</Project>
