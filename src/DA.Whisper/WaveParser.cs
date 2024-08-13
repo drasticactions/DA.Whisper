@@ -272,6 +272,7 @@ public sealed class WaveParser
                 sampleIndex++;
             }
         }
+
         if (sampleIndex < this.SamplesCount)
         {
             throw new CorruptedWaveException("Invalid wave file, the size is too small and couldn't read all the samples.");
@@ -367,7 +368,9 @@ public sealed class WaveParser
 
         // Read Format
         var format = BitConverter.ToUInt16(fmtBuffer, 0);
-        if (format != 1 && format != 65534) // Allow both standard PCM and WAVE_FORMAT_EXTENSIBLE
+
+        // Allow both standard PCM and WAVE_FORMAT_EXTENSIBLE
+        if (format != 1 && format != 65534)
         {
             throw new CorruptedWaveException("Unsupported wave file");
         }
