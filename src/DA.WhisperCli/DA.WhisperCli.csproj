@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\runtime\Whisper.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\DA.Whisper\DA.Whisper.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishAOT>true</PublishAOT>
+  </PropertyGroup>
+
+</Project>
