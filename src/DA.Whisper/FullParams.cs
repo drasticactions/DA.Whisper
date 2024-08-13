@@ -1,333 +1,478 @@
+// <copyright file="FullParams.cs" company="Drastic Actions">
+// Copyright (c) Drastic Actions. All rights reserved.
+// </copyright>
+
 using System;
 using System.Runtime.InteropServices;
 
 namespace DA.Whisper;
 
+/// <summary>
+/// Represents the full parameters for the Whisper class.
+/// </summary>
 public class FullParams
 {
-    private whisper_full_params _params;
+    /// <summary>
+    /// The underlying whisper_full_params object.
+    /// </summary>
+    private whisper_full_params @params;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FullParams"/> class with the specified sampling strategy.
+    /// </summary>
+    /// <param name="strategy">The sampling strategy.</param>
     internal FullParams(SamplingStrategy strategy)
     {
-        _params = NativeMethods.whisper_full_default_params((int)strategy);
+        this.@params = NativeMethods.whisper_full_default_params((int)strategy);
     }
 
-    internal ref whisper_full_params Params => ref _params;
-
+    /// <summary>
+    /// Gets or sets the strategy.
+    /// </summary>
     public int Strategy
     {
-        get => _params.strategy;
-        set => _params.strategy = value;
+        get => this.@params.strategy;
+        set => this.@params.strategy = value;
     }
 
+    /// <summary>
+    /// Gets or sets the number of threads.
+    /// </summary>
     public int Threads
     {
-        get => _params.n_threads;
-        set => _params.n_threads = value;
+        get => this.@params.n_threads;
+        set => this.@params.n_threads = value;
     }
 
+    /// <summary>
+    /// Gets or sets the maximum text context.
+    /// </summary>
     public int MaxTextContext
     {
-        get => _params.n_max_text_ctx;
-        set => _params.n_max_text_ctx = value;
+        get => this.@params.n_max_text_ctx;
+        set => this.@params.n_max_text_ctx = value;
     }
 
+    /// <summary>
+    /// Gets or sets the offset in milliseconds.
+    /// </summary>
     public int OffsetMs
     {
-        get => _params.offset_ms;
-        set => _params.offset_ms = value;
+        get => this.@params.offset_ms;
+        set => this.@params.offset_ms = value;
     }
 
+    /// <summary>
+    /// Gets or sets the duration in milliseconds.
+    /// </summary>
     public int DurationMs
     {
-        get => _params.duration_ms;
-        set => _params.duration_ms = value;
+        get => this.@params.duration_ms;
+        set => this.@params.duration_ms = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable translation.
+    /// </summary>
     public bool Translate
     {
-        get => _params.translate;
-        set => _params.translate = value;
+        get => this.@params.translate;
+        set => this.@params.translate = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to disable context.
+    /// </summary>
     public bool NoContext
     {
-        get => _params.no_context;
-        set => _params.no_context = value;
+        get => this.@params.no_context;
+        set => this.@params.no_context = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to disable timestamps.
+    /// </summary>
     public bool NoTimestamps
     {
-        get => _params.no_timestamps;
-        set => _params.no_timestamps = value;
+        get => this.@params.no_timestamps;
+        set => this.@params.no_timestamps = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to use single segment.
+    /// </summary>
     public bool SingleSegment
     {
-        get => _params.single_segment;
-        set => _params.single_segment = value;
+        get => this.@params.single_segment;
+        set => this.@params.single_segment = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to print special characters.
+    /// </summary>
     public bool PrintSpecial
     {
-        get => _params.print_special;
-        set => _params.print_special = value;
+        get => this.@params.print_special;
+        set => this.@params.print_special = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to print progress.
+    /// </summary>
     public bool PrintProgress
     {
-        get => _params.print_progress;
-        set => _params.print_progress = value;
+        get => this.@params.print_progress;
+        set => this.@params.print_progress = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to print in real-time.
+    /// </summary>
     public bool PrintRealtime
     {
-        get => _params.print_realtime;
-        set => _params.print_realtime = value;
+        get => this.@params.print_realtime;
+        set => this.@params.print_realtime = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to print timestamps.
+    /// </summary>
     public bool PrintTimestamps
     {
-        get => _params.print_timestamps;
-        set => _params.print_timestamps = value;
+        get => this.@params.print_timestamps;
+        set => this.@params.print_timestamps = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to include token timestamps.
+    /// </summary>
     public bool TokenTimestamps
     {
-        get => _params.token_timestamps;
-        set => _params.token_timestamps = value;
+        get => this.@params.token_timestamps;
+        set => this.@params.token_timestamps = value;
     }
 
+    /// <summary>
+    /// Gets or sets the threshold for PT.
+    /// </summary>
     public float ThresholdPt
     {
-        get => _params.thold_pt;
-        set => _params.thold_pt = value;
+        get => this.@params.thold_pt;
+        set => this.@params.thold_pt = value;
     }
 
+    /// <summary>
+    /// Gets or sets the threshold for PT sum.
+    /// </summary>
     public float ThresholdPtsum
     {
-        get => _params.thold_ptsum;
-        set => _params.thold_ptsum = value;
+        get => this.@params.thold_ptsum;
+        set => this.@params.thold_ptsum = value;
     }
 
+    /// <summary>
+    /// Gets or sets the maximum length.
+    /// </summary>
     public int MaxLength
     {
-        get => _params.max_len;
-        set => _params.max_len = value;
+        get => this.@params.max_len;
+        set => this.@params.max_len = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to split on word.
+    /// </summary>
     public bool SplitOnWord
     {
-        get => _params.split_on_word;
-        set => _params.split_on_word = value;
+        get => this.@params.split_on_word;
+        set => this.@params.split_on_word = value;
     }
 
+    /// <summary>
+    /// Gets or sets the maximum number of tokens.
+    /// </summary>
     public int MaxTokens
     {
-        get => _params.max_tokens;
-        set => _params.max_tokens = value;
+        get => this.@params.max_tokens;
+        set => this.@params.max_tokens = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable debug mode.
+    /// </summary>
     public bool DebugMode
     {
-        get => _params.debug_mode;
-        set => _params.debug_mode = value;
+        get => this.@params.debug_mode;
+        set => this.@params.debug_mode = value;
     }
 
+    /// <summary>
+    /// Gets or sets the audio context.
+    /// </summary>
     public int AudioContext
     {
-        get => _params.audio_ctx;
-        set => _params.audio_ctx = value;
+        get => this.@params.audio_ctx;
+        set => this.@params.audio_ctx = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable TDRZ.
+    /// </summary>
     public bool TdrzEnable
     {
-        get => _params.tdrz_enable;
-        set => _params.tdrz_enable = value;
+        get => this.@params.tdrz_enable;
+        set => this.@params.tdrz_enable = value;
     }
 
+    /// <summary>
+    /// Gets or sets the language.
+    /// </summary>
     public string Language
     {
         get
         {
             unsafe
             {
-                return Marshal.PtrToStringAnsi((IntPtr)_params.language) ?? string.Empty;
+                return Marshal.PtrToStringAnsi((IntPtr)this.@params.language) ?? string.Empty;
             }
         }
+
         set
         {
             unsafe
             {
-                _params.language = (byte*)Marshal.StringToHGlobalAnsi(value);
+                this.@params.language = (byte*)Marshal.StringToHGlobalAnsi(value);
             }
         }
     }
 
+    /// <summary>
+    /// Gets or sets the initial prompt.
+    /// </summary>
     public string InitialPrompt
     {
         get
         {
             unsafe
             {
-                return Marshal.PtrToStringAnsi((IntPtr)_params.initial_prompt) ?? string.Empty;
+                return Marshal.PtrToStringAnsi((IntPtr)this.@params.initial_prompt) ?? string.Empty;
             }
         }
+
         set
         {
             unsafe
             {
-                _params.initial_prompt = (byte*)Marshal.StringToHGlobalAnsi(value);
+                this.@params.initial_prompt = (byte*)Marshal.StringToHGlobalAnsi(value);
             }
         }
     }
 
+    /// <summary>
+    /// Gets or sets the suppress regex.
+    /// </summary>
     public string SuppressRegex
     {
-        get 
+        get
         {
             unsafe
             {
-                return Marshal.PtrToStringAnsi((IntPtr)_params.suppress_regex) ?? string.Empty;
+                return Marshal.PtrToStringAnsi((IntPtr)this.@params.suppress_regex) ?? string.Empty;
             }
         }
+
         set
         {
             unsafe
             {
-                _params.suppress_regex = (byte*)Marshal.StringToHGlobalAnsi(value);
+                this.@params.suppress_regex = (byte*)Marshal.StringToHGlobalAnsi(value);
             }
         }
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to detect language.
+    /// </summary>
     public bool DetectLanguage
     {
-        get => _params.detect_language;
-        set => _params.detect_language = value;
+        get => this.@params.detect_language;
+        set => this.@params.detect_language = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to suppress blank.
+    /// </summary>
     public bool SuppressBlank
     {
-        get => _params.suppress_blank;
-        set => _params.suppress_blank = value;
+        get => this.@params.suppress_blank;
+        set => this.@params.suppress_blank = value;
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to suppress non-speech tokens.
+    /// </summary>
     public bool SuppressNonSpeechTokens
     {
-        get => _params.suppress_non_speech_tokens;
-        set => _params.suppress_non_speech_tokens = value;
+        get => this.@params.suppress_non_speech_tokens;
+        set => this.@params.suppress_non_speech_tokens = value;
     }
 
+    /// <summary>
+    /// Gets or sets the temperature.
+    /// </summary>
     public float Temperature
     {
-        get => _params.temperature;
-        set => _params.temperature = value;
+        get => this.@params.temperature;
+        set => this.@params.temperature = value;
     }
 
+    /// <summary>
+    /// Gets or sets the maximum initial timestamp.
+    /// </summary>
     public float MaxInitialTimestamp
     {
-        get => _params.max_initial_ts;
-        set => _params.max_initial_ts = value;
+        get => this.@params.max_initial_ts;
+        set => this.@params.max_initial_ts = value;
     }
 
+    /// <summary>
+    /// Gets or sets the length penalty.
+    /// </summary>
     public float LengthPenalty
     {
-        get => _params.length_penalty;
-        set => _params.length_penalty = value;
+        get => this.@params.length_penalty;
+        set => this.@params.length_penalty = value;
     }
 
+    /// <summary>
+    /// Gets or sets the temperature increment.
+    /// </summary>
     public float TemperatureIncrement
     {
-        get => _params.temperature_inc;
-        set => _params.temperature_inc = value;
+        get => this.@params.temperature_inc;
+        set => this.@params.temperature_inc = value;
     }
 
+    /// <summary>
+    /// Gets or sets the entropy threshold.
+    /// </summary>
     public float EntropyThreshold
     {
-        get => _params.entropy_thold;
-        set => _params.entropy_thold = value;
+        get => this.@params.entropy_thold;
+        set => this.@params.entropy_thold = value;
     }
 
+    /// <summary>
+    /// Gets or sets the log probability threshold.
+    /// </summary>
     public float LogprobThreshold
     {
-        get => _params.logprob_thold;
-        set => _params.logprob_thold = value;
+        get => this.@params.logprob_thold;
+        set => this.@params.logprob_thold = value;
     }
 
+    /// <summary>
+    /// Gets or sets the no speech threshold.
+    /// </summary>
     public float NoSpeechThreshold
     {
-        get => _params.no_speech_thold;
-        set => _params.no_speech_thold = value;
+        get => this.@params.no_speech_thold;
+        set => this.@params.no_speech_thold = value;
     }
 
+    /// <summary>
+    /// Gets or sets the best of value for greedy strategy.
+    /// </summary>
     public int BestOf
     {
-        get => _params.greedy.best_of;
-        set => _params.greedy.best_of = value;
+        get => this.@params.greedy.best_of;
+        set => this.@params.greedy.best_of = value;
     }
 
+    /// <summary>
+    /// Gets or sets the beam size for beam search strategy.
+    /// </summary>
     public int BeamSize
     {
-        get => _params.beam_search.beam_size;
-        set => _params.beam_search.beam_size = value;
+        get => this.@params.beam_search.beam_size;
+        set => this.@params.beam_search.beam_size = value;
     }
 
+    /// <summary>
+    /// Gets or sets the patience for beam search strategy.
+    /// </summary>
     public float Patience
     {
-        get => _params.beam_search.patience;
-        set => _params.beam_search.patience = value;
+        get => this.@params.beam_search.patience;
+        set => this.@params.beam_search.patience = value;
     }
 
+    /// <summary>
+    /// Gets the underlying whisper_full_params object.
+    /// </summary>
+    internal ref whisper_full_params Params => ref this.@params;
+
+    /// <summary>
+    /// Creates a new instance of <see cref="FullParams"/> with the Greedy sampling strategy.
+    /// </summary>
+    /// <returns>A new instance of <see cref="FullParams"/> with the Greedy sampling strategy.</returns>
     public static FullParams FromGreedyStrategy()
     {
         return new FullParams(SamplingStrategy.Greedy);
     }
 
+    /// <summary>
+    /// Creates a new instance of <see cref="FullParams"/> with the BeamSearch sampling strategy.
+    /// </summary>
+    /// <returns>A new instance of <see cref="FullParams"/> with the BeamSearch sampling strategy.</returns>
     public static FullParams FromBeamSearchStrategy()
     {
         return new FullParams(SamplingStrategy.BeamSearch);
     }
 
+    /// <summary>
+    /// Returns a string representation of the <see cref="FullParams"/> object.
+    /// </summary>
+    /// <returns>A string representation of the <see cref="FullParams"/> object.</returns>
     public override string ToString()
     {
-        return $"strategy: {Strategy}\n" +
-               $"n_threads: {Threads}\n" +
-               $"n_max_text_ctx: {MaxTextContext}\n" +
-               $"offset_ms: {OffsetMs}\n" +
-               $"duration_ms: {DurationMs}\n" +
-               $"translate: {Translate}\n" +
-               $"no_context: {NoContext}\n" +
-               $"no_timestamps: {NoTimestamps}\n" +
-               $"single_segment: {SingleSegment}\n" +
-               $"print_special: {PrintSpecial}\n" +
-               $"print_progress: {PrintProgress}\n" +
-               $"print_realtime: {PrintRealtime}\n" +
-               $"print_timestamps: {PrintTimestamps}\n" +
-               $"token_timestamps: {TokenTimestamps}\n" +
-               $"thold_pt: {ThresholdPt}\n" +
-               $"thold_ptsum: {ThresholdPtsum}\n" +
-               $"max_len: {MaxLength}\n" +
-               $"split_on_word: {SplitOnWord}\n" +
-               $"max_tokens: {MaxTokens}\n" +
-               $"debug_mode: {DebugMode}\n" +
-               $"audio_ctx: {AudioContext}\n" +
-               $"tdrz_enable: {TdrzEnable}\n" +
-               $"suppress_regex: {SuppressRegex}\n" +
-               $"initial_prompt: {InitialPrompt}\n" +
-               $"detect_language: {DetectLanguage}\n" +
-               $"language: {Language}\n" +
-               $"suppress_blank: {SuppressBlank}\n" +
-               $"suppress_non_speech_tokens: {SuppressNonSpeechTokens}\n" +
-               $"temperature: {Temperature}\n" +
-               $"max_initial_ts: {MaxInitialTimestamp}\n" +
-               $"length_penalty: {LengthPenalty}\n" +
-               $"temperature_inc: {TemperatureIncrement}\n" +
-               $"entropy_thold: {EntropyThreshold}\n" +
-               $"logprob_thold: {LogprobThreshold}\n" +
-               $"no_speech_thold: {NoSpeechThreshold}\n" +
-               $"greedy.best_of: {BestOf}\n" +
-               $"beam_search.beam_size: {BeamSize}\n" +
-               $"beam_search.patience: {Patience}";
+        return $"strategy: {this.Strategy}\n" +
+               $"n_threads: {this.Threads}\n" +
+               $"n_max_text_ctx: {this.MaxTextContext}\n" +
+               $"offset_ms: {this.OffsetMs}\n" +
+               $"duration_ms: {this.DurationMs}\n" +
+               $"translate: {this.Translate}\n" +
+               $"no_context: {this.NoContext}\n" +
+               $"no_timestamps: {this.NoTimestamps}\n" +
+               $"single_segment: {this.SingleSegment}\n" +
+               $"print_special: {this.PrintSpecial}\n" +
+               $"print_progress: {this.PrintProgress}\n" +
+               $"print_realtime: {this.PrintRealtime}\n" +
+               $"print_timestamps: {this.PrintTimestamps}\n" +
+               $"token_timestamps: {this.TokenTimestamps}\n" +
+               $"thold_pt: {this.ThresholdPt}\n" +
+               $"thold_ptsum: {this.ThresholdPtsum}\n" +
+               $"max_len: {this.MaxLength}\n" +
+               $"split_on_word: {this.SplitOnWord}\n" +
+               $"max_tokens: {this.MaxTokens}\n" +
+               $"debug_mode: {this.DebugMode}\n" +
+               $"audio_ctx: {this.AudioContext}\n" +
+               $"tdrz_enable: {this.TdrzEnable}\n" +
+               $"suppress_regex: {this.SuppressRegex}\n" +
+               $"initial_prompt: {this.InitialPrompt}\n" +
+               $"detect_language: {this.DetectLanguage}\n" +
+               $"language: {this.Language}\n" +
+               $"suppress_blank: {this.SuppressBlank}\n" +
+               $"suppress_non_speech_tokens: {this.SuppressNonSpeechTokens}\n" +
+               $"temperature: {this.Temperature}\n" +
+               $"max_initial_ts: {this.MaxInitialTimestamp}\n" +
+               $"length_penalty: {this.LengthPenalty}\n" +
+               $"temperature_inc: {this.TemperatureIncrement}\n" +
+               $"entropy_thold: {this.EntropyThreshold}\n" +
+               $"logprob_thold: {this.LogprobThreshold}\n" +
+               $"no_speech_thold: {this.NoSpeechThreshold}\n" +
+               $"greedy.best_of: {this.BestOf}\n" +
+               $"beam_search.beam_size: {this.BeamSize}\n" +
+               $"beam_search.patience: {this.Patience}";
     }
 }
-

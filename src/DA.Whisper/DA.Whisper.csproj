@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net8.0-ios;net8.0-tvos;net8.0-macos;net8.0-maccatalyst</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <IsAotCompatible>true</IsAotCompatible>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<IsAotCompatible>true</IsAotCompatible>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<NoWarn>SA0001</NoWarn>
+	</PropertyGroup>
 
 </Project>

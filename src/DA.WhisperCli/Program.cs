@@ -1,4 +1,8 @@
-﻿using DA.Whisper;
+﻿// <copyright file="Program.cs" company="Drastic Actions">
+// Copyright (c) Drastic Actions. All rights reserved.
+// </copyright>
+
+using DA.Whisper;
 
 // Console.WriteLine(DA.Whisper.WhisperModel.WhisperSystemInfo);
 WhisperLogger.Instance.OnLog += (args) => Console.WriteLine(args);
