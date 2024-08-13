@@ -35,4 +35,24 @@
             <TargetPath>ggml.dll</TargetPath>
         </None>
     </ItemGroup>
+    <ItemGroup Condition="$(TargetFramework.Contains('-')) == false AND $(IsOSX)">
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)macos\libwhisper.dylib">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>libwhisper.dylib</TargetPath>
+        </None>
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)macos\ggml-common.h">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>ggml-common.h</TargetPath>
+        </None>
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)macos\ggml-metal.metal">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>ggml-metal.metal</TargetPath>
+        </None>
+    </ItemGroup>
 </Project>

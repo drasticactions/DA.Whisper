@@ -13,17 +13,17 @@ public sealed class WaveParser
 {
     private static readonly byte[] ExpectedSubFormatForPcm = new byte[] { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 };
     private readonly Stream waveStream;
-    private ushort channels = 0;
-    private uint sampleRate = 0;
-    private ushort bitsPerSample = 0;
-    private uint dataChunkSize = 0;
-    private long dataChunkPosition = 0;
-    private bool isInitialized = false;
+    private ushort channels;
+    private uint sampleRate;
+    private ushort bitsPerSample;
+    private uint dataChunkSize;
+    private long dataChunkPosition;
+    private bool isInitialized;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WaveParser"/> class.
     /// </summary>
-    /// <param name="waveStream">The wave stream.</param>
+    /// <param name="waveStream">The wave.</param>
     public WaveParser(Stream waveStream)
     {
         this.waveStream = waveStream;
@@ -104,7 +104,7 @@ public sealed class WaveParser
     /// <summary>
     /// Returns the average samples from all channels.
     /// </summary>
-    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the operation.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task<float[]> GetAvgSamplesAsync(CancellationToken cancellationToken = default)
     {
@@ -130,7 +130,7 @@ public sealed class WaveParser
     /// <summary>
     /// Returns the average samples from all channels.
     /// </summary>
-    /// <returns>The average samples.</returns>
+    /// <returns>The samples.</returns>
     public float[] GetAvgSamples()
     {
         this.Initialize();
@@ -157,10 +157,11 @@ public sealed class WaveParser
     }
 
     /// <summary>
-    /// Returns the samples from a specific channel.
+    /// Returns the samples for a specific channel.
     /// </summary>
-    /// <param name="channelIndex">The index of the channel.</param>
-    /// <returns>An array of samples from the specified channel.</returns>
+    /// <param name="channelIndex">The channel index.</param>
+    /// <returns>Samples.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if channel index is greater than channel list.</exception>
     public float[] GetChannelSamples(int channelIndex = 0)
     {
         this.Initialize();
@@ -186,11 +187,11 @@ public sealed class WaveParser
     }
 
     /// <summary>
-    /// Returns the samples from a specific channel.
+    /// Returns the samples for a specific channel.
     /// </summary>
-    /// <param name="channelIndex">The index of the channel.</param>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    /// <param name="channelIndex">The index.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
     public async Task<float[]> GetChannelSamplesAsync(int channelIndex = 0, CancellationToken cancellationToken = default)
     {
         await this.InitializeAsync(cancellationToken);
@@ -221,7 +222,7 @@ public sealed class WaveParser
     /// <summary>
     /// Initializes the wave parser, by reading the header and the format chunk in an async manner.
     /// </summary>
-    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the operation.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -271,7 +272,6 @@ public sealed class WaveParser
                 sampleIndex++;
             }
         }
-
         if (sampleIndex < this.SamplesCount)
         {
             throw new CorruptedWaveException("Invalid wave file, the size is too small and couldn't read all the samples.");
@@ -367,11 +367,93 @@ public sealed class WaveParser
 
         // Read Format
         var format = BitConverter.ToUInt16(fmtBuffer, 0);
-
-        // Allow both standard PCM and WAVE_FORMAT_EXTENSIBLE
-        if (format != 1 && format != 65534)
+        if (format != 1 && format != 65534) // Allow both standard PCM and WAVE_FORMAT_EXTENSIBLE
         {
             throw new CorruptedWaveException("Unsupported wave file");
         }
+
+        // If the file is in WAVE_FORMAT_EXTENSIBLE format, we'll need to read the SubFormat field
+        if (format == 65534)
+        {
+            // Verify that fmtChunkSize is at least 40, which is required for WAVE_FORMAT_EXTENSIBLE
+            if (fmtChunkSize < 40)
+            {
+                throw new CorruptedWaveException("Invalid wave format size.");
+            }
+
+            // The SubFormat field is a GUID, but for PCM data it will be {00000001-0000-0010-8000-00aa00389b71}
+            // Check this manually, byte by byte
+            for (var i = 0; i < 16; i++)
+            {
+                if (fmtBuffer[24 + i] != ExpectedSubFormatForPcm[i])
+                {
+                    throw new CorruptedWaveException("Unsupported wave file format. Only PCM is supported.");
+                }
+            }
+        }
+
+        this.channels = BitConverter.ToUInt16(fmtBuffer, 2);
+        if (this.channels == 0)
+        {
+            throw new NotSupportedWaveException("Cannot read wave file with 0 channels.");
+        }
+
+        this.sampleRate = BitConverter.ToUInt32(fmtBuffer, 4);
+        if (this.sampleRate != 16000)
+        {
+            throw new NotSupportedWaveException("Only 16KHz sample rate is supported.");
+        }
+
+        // Skip Average bytes rate 8 => 12
+
+        // Skip Block Allign 12 => 14
+        this.bitsPerSample = BitConverter.ToUInt16(fmtBuffer, 14);
+
+        if (this.bitsPerSample != 8 && this.bitsPerSample != 16 && this.bitsPerSample != 24 && this.bitsPerSample != 32)
+        {
+            throw new NotSupportedWaveException($"Bits per sample {this.bitsPerSample} is not supported.");
+        }
+
+        // Seek data chuunk
+        // Read chunk name and size
+        await ReadBytesAsync(buffer, 0, 8);
+
+        while (buffer[0] != 'd' || buffer[1] != 'a' || buffer[2] != 't' || buffer[3] != 'a')
+        {
+            var chunkSize = BitConverter.ToInt32(buffer, 4);
+            if (chunkSize < 0)
+            {
+                throw new CorruptedWaveException("Invalid wave chunk size.");
+            }
+
+            if (this.waveStream.CanSeek)
+            {
+                this.waveStream.Seek(chunkSize, SeekOrigin.Current);
+            }
+            else
+            {
+                var restOfChunk = new byte[chunkSize];
+                await ReadBytesAsync(restOfChunk, 0, chunkSize);
+            }
+
+            actualRead = await ReadBytesAsync(buffer, 0, 8);
+
+            if (actualRead != 8)
+            {
+                throw new CorruptedWaveException("Invalid wave chunk size.");
+            }
+        }
+
+        this.dataChunkSize = BitConverter.ToUInt32(buffer, 4);
+
+        // if the data chunk is not specified, it means the wave was constructed on the fly
+        // and we need to read until the end of the stream
+        if (this.dataChunkSize == uint.MaxValue)
+        {
+            this.dataChunkSize = (uint)(this.waveStream.Length - this.waveStream.Position);
+        }
+
+        this.dataChunkPosition = this.waveStream.Position;
+        this.isInitialized = true;
     }
 }
