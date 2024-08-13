@@ -2,18 +2,36 @@
 // Copyright (c) Drastic Actions. All rights reserved.
 // </copyright>
 
+using ConsoleAppFramework;
 using DA.Whisper;
 
-// Console.WriteLine(DA.Whisper.WhisperModel.WhisperSystemInfo);
-WhisperLogger.Instance.OnLog += (args) => Console.WriteLine(args);
+// WhisperLogger.Instance.OnLog += (args) =>
+// {
+//     Console.WriteLine(args);
+// };
 
-var jfk = File.OpenRead("/Users/drasticactions/Developer/Apps/DA.Whisper/external/whisper.cpp/samples/jfk.wav");
+var app = ConsoleApp.Create();
+app.Add<WhisperCommands>();
+app.Run(args);
 
-var model = WhisperModel.FromFile("/Users/drasticactions/Developer/Models/Whisper/ggml-tiny.en.bin");
-var processor = WhisperProcessor.CreateWithDefaultGreedyStrategy(model);
-
-var result = processor.ProcessAsync(jfk);
-await foreach (var segment in result)
+public class WhisperCommands
 {
-    Console.WriteLine(segment);
+    /// <summary>Transcribe audio file to text.</summary>
+    /// <param name="model">-m, Whisper Model.</param>
+    /// <param name="audioFile">-a, Audio file to transcribe.</param>
+    [Command("transcribe")]
+    public void Transcribe(string model, string audioFile)
+    {
+    }
 }
+
+// var jfk = File.OpenRead("/Users/drasticactions/Developer/Apps/DA.Whisper/external/whisper.cpp/samples/jfk.wav");
+
+// var model = WhisperModel.FromFile("/Users/drasticactions/Developer/Models/Whisper/ggml-tiny.en.bin");
+// var processor = WhisperProcessor.CreateWithDefaultGreedyStrategy(model);
+
+// var result = processor.ProcessAsync(jfk);
+// await foreach (var segment in result)
+// {
+//     Console.WriteLine(segment);
+// }
