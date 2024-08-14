@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DA.Whisper\DA.Whisper.csproj" />
     <ProjectReference Include="..\DA.Whisper.Helpers\DA.Whisper.Helpers.csproj" />
+    <ProjectReference Include="..\DA.Whisper.FFMpeg\DA.Whisper.FFMpeg.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="5.2.3">

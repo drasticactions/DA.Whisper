@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace DA.Whisper;
 
@@ -17,7 +18,8 @@ public class ContextParams
     /// <summary>
     /// Initializes a new instance of the <see cref="ContextParams"/> class.
     /// </summary>
-    internal ContextParams()
+    [JsonConstructor]
+    public ContextParams()
     {
         this.@params = NativeMethods.whisper_context_default_params();
     }

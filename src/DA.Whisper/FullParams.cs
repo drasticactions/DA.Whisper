@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace DA.Whisper;
 
@@ -16,6 +17,15 @@ public class FullParams
     /// The underlying whisper_full_params object.
     /// </summary>
     private whisper_full_params @params;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FullParams"/> class with the specified sampling strategy.
+    /// </summary>
+    [JsonConstructor]
+    public FullParams()
+    {
+        this.@params = NativeMethods.whisper_full_default_params((int)SamplingStrategy.Greedy);
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FullParams"/> class with the specified sampling strategy.

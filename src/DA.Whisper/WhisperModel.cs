@@ -59,6 +59,23 @@ public sealed class WhisperModel : IDisposable
     }
 
     /// <summary>
+    /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model path.
+    /// </summary>
+    /// <param name="modelPath">The path to the Whisper model file.</param>
+    /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
+    public static WhisperModel? TryFromFile(string modelPath)
+    {
+        try
+        {
+            return new WhisperModel(modelPath, ContextParams.FromDefault());
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model path and context parameters.
     /// </summary>
     /// <param name="modelPath">The path to the Whisper model file.</param>
@@ -67,6 +84,24 @@ public sealed class WhisperModel : IDisposable
     public static WhisperModel FromFileWithParameters(string modelPath, ContextParams contextParams)
     {
         return new WhisperModel(modelPath, contextParams);
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model path and context parameters.
+    /// </summary>
+    /// <param name="modelPath">The path to the Whisper model file.</param>
+    /// <param name="contextParams">The context parameters for the Whisper model.</param>
+    /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
+    public static WhisperModel? TryFromFileWithParameters(string modelPath, ContextParams contextParams)
+    {
+        try
+        {
+            return new WhisperModel(modelPath, contextParams);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     /// <summary>

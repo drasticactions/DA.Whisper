@@ -14,15 +14,15 @@ public class FFMpegTranscodeService : ITranscodeService, IDisposable
 {
     private string basePath;
     private string? generatedFilename;
-    private ILogger logger;
+    private ILogger? logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FFMpegTranscodeService"/> class.
     /// </summary>
-    /// <param name="logger">The logger.</param>
     /// <param name="basePath">The base path for the transcode service. If not provided, the default temporary path will be used.</param>
     /// <param name="generatedFilename">The generated filename for the transcode service. If not provided, a random filename will be generated.</param>
-    public FFMpegTranscodeService(ILogger logger, string? basePath = default, string? generatedFilename = default)
+    /// <param name="logger">The logger.</param>
+    public FFMpegTranscodeService(string? basePath = default, string? generatedFilename = default, ILogger? logger = default)
     {
         this.logger = logger;
         this.basePath = basePath ?? Path.GetTempPath();

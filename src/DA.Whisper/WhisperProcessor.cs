@@ -88,6 +88,24 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
+    /// Creates a new <see cref="WhisperProcessor"/> instance with the specified parameters.
+    /// </summary>
+    /// <param name="model">The Whisper model.</param>
+    /// <param name="fullParams">The full parameters.</param>
+    /// <returns>The created <see cref="WhisperProcessor"/> instance.</returns>
+    public static WhisperProcessor? TryCreateWithParams(WhisperModel model, FullParams fullParams)
+    {
+        try
+        {
+            return new WhisperProcessor(model, fullParams);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Processes the audio stream asynchronously.
     /// </summary>
     /// <param name="waveStream">The audio stream.</param>
