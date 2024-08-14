@@ -6,6 +6,7 @@
   <PropertyGroup>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DebugType>embedded</DebugType>
+    <NoWarn>SA0001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

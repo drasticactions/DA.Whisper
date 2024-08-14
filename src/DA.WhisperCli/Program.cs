@@ -16,11 +16,11 @@ app.Run(args);
 
 public class WhisperCommands
 {
-    /// <summary>Transcribe audio file to text.</summary>
+    /// <summary>Transcribe media file to text.</summary>
+    /// <param name="mediaFile">Media file to transcribe.</param>
     /// <param name="model">-m, Whisper Model.</param>
-    /// <param name="audioFile">-a, Audio file to transcribe.</param>
     [Command("transcribe")]
-    public void Transcribe(string model, string audioFile)
+    public void Transcribe([Argument]string mediaFile, string model)
     {
     }
 }

@@ -2,6 +2,7 @@
   <Import Project="..\..\runtime\Whisper.targets" />
   <ItemGroup>
     <ProjectReference Include="..\DA.Whisper\DA.Whisper.csproj" />
+    <ProjectReference Include="..\DA.Whisper.Helpers\DA.Whisper.Helpers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="5.2.3">
