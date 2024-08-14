@@ -7,6 +7,9 @@ clean:
 	rm -rf build
 	rm -rf runtime
 
+binding:
+	cd $(ROOT)/bindings/whisper-bindings && cargo build --release
+
 macos:
 	rm -rf build/macos
 	cmake $(PROJECT_ROOT) $(CMAKE_PARAMETERS) -DGGML_METAL=ON -DGGML_METAL_EMBED_LIBRARY=ON -DCMAKE_BUILD_TYPE=Release -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=ON -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -B $(ROOT)/build/macos
