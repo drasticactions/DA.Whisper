@@ -37,7 +37,7 @@ public class VlcTranscodeService : ITranscodeService, IDisposable
     public string BasePath => this.basePath;
 
     /// <inheritdoc/>
-    public async Task<string> ProcessFile(string file)
+    public async Task<(string FilePath, bool Transcoded)> ProcessFile(string file)
     {
         using var mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(this.libVLC);
         var processingCancellationTokenSource = new CancellationTokenSource();
@@ -71,7 +71,7 @@ public class VlcTranscodeService : ITranscodeService, IDisposable
             }
         }
 
-        return outputfile;
+        return (outputfile, true);
     }
 
     /// <inheritdoc/>

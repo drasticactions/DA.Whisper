@@ -6,17 +6,19 @@ using System.Text.Json;
 using ConsoleAppFramework;
 using DA.Whisper;
 using DA.WhisperCli;
+using Microsoft.Extensions.Logging;
 
-// WhisperLogger.Instance.OnLog += (args) =>
-// {
-//     Console.WriteLine(args);
-// };
-
+_ = WhisperLogger.Instance;
 var app = ConsoleApp.Create();
 app.Add<WhisperCommands>();
 app.Run(args);
 
+/// <summary>
+/// Whisper Commands.
+/// </summary>
+#pragma warning disable SA1649 // File name should match first type name
 public class WhisperCommands
+#pragma warning restore SA1649 // File name should match first type name
 {
     /// <summary>Transcribe media file to text.</summary>
     /// <param name="mediaFile">Media file to transcribe.</param>
@@ -25,46 +27,111 @@ public class WhisperCommands
     /// <param name="parameterFile">-p, Optional Parameter file. Generate the file with 'generate-parameter-file'.</param>
     /// <param name="defaultSamplingStrategy">-s, Default Sampling Strategy, ignored if parameter file is used.</param>
     /// <param name="transcodeFile">-t, Transcode the file using ffmpeg to a format that Whisper can process. Requires ffmpeg to be installed.</param>
+    /// <param name="printTimestamps">-ts, Print timestamps with the text.</param>
+    /// <param name="srt">-srt, Output the text to a file in SRT format.</param>
+    /// <param name="outputDirectory">-o, Output directory for the SRT file, defaults to the current working directory.</param>
+    /// <param name="outputFilename">-of, Output file name for the SRT file, defaults to the name of the media file if available.</param>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    /// <returns>Task.</returns>
     [Command("transcribe")]
-    public async Task TranscribeAsync([Argument]string mediaFile, string model, string? contextFile = default, string? parameterFile = default, SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy, bool transcodeFile = true)
+    public async Task TranscribeAsync(
+        [Argument] string mediaFile,
+        string model,
+        string? contextFile = default,
+        string? parameterFile = default,
+        SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy,
+        bool transcodeFile = true,
+        bool printTimestamps = false,
+        bool srt = false,
+        string? outputDirectory = default,
+        string? outputFilename = default,
+        bool verbose = false)
     {
-        var logger = WhisperLogger.Instance;
-        var ffmpeg = new FFMpegTranscodeService();
+        var consoleLog = new ConsoleLog(verbose);
+        this.SetupWhisperLogger(verbose);
+        var ffmpeg = new FFMpegTranscodeService(logger: this.SetupLogger("ffmpeg", verbose));
         var contextParams = this.GetContextParams(contextFile);
         if (contextParams == null)
         {
-            Console.WriteLine("Unable to load context parameters.");
+            consoleLog.LogError("Unable to load context parameters.");
             return;
         }
 
         var fullParams = this.GetFullParams(parameterFile, defaultSamplingStrategy);
         if (fullParams == null)
         {
-            Console.WriteLine("Unable to load parameters.");
+            consoleLog.LogError("Unable to load parameters.");
             return;
         }
 
-        using var whisperModel = WhisperModel.TryFromFileWithParameters(model, contextParams);
-        if (whisperModel == null)
+        if (!WhisperModel.TryFromFileWithParameters(model, contextParams, out WhisperModel? whisperModel) || whisperModel is null)
         {
-            Console.WriteLine("Unable to load model.");
+            consoleLog.LogError("Unable to load model.");
             return;
         }
 
-        using var processor = WhisperProcessor.TryCreateWithParams(whisperModel, fullParams);
-        if (processor == null)
+        if (!WhisperProcessor.TryCreateWithParams(whisperModel, fullParams, out WhisperProcessor? processor) || processor is null)
         {
-            Console.WriteLine("Unable to create processor.");
+            consoleLog.LogError("Unable to create processor.");
             return;
         }
 
-        var processFile = transcodeFile ? await ffmpeg.ProcessFile(mediaFile) : mediaFile;
+        var transcoded = false;
+        var processFile = mediaFile;
+        if (transcodeFile)
+        {
+            var transcodeResult = await ffmpeg.ProcessFile(mediaFile);
+            if (transcodeResult.Transcoded)
+            {
+                processFile = transcodeResult.FilePath;
+                transcoded = true;
+            }
+        }
+
         using var processFileStream = File.OpenRead(processFile);
         var result = processor.ProcessAsync(processFileStream);
+        SrtSubtitle? srtSubtitle = null;
+        if (srt)
+        {
+            srtSubtitle = new SrtSubtitle();
+        }
+
         await foreach (var segment in result)
         {
-            Console.WriteLine(segment.Text);
+            var text = printTimestamps ? $"[{segment.Start} - {segment.End}] {segment.Text}" : segment.Text;
+            consoleLog.Log(text);
+            srtSubtitle?.AddSegment(segment);
         }
+
+        if (transcoded)
+        {
+            consoleLog.LogDebug($"Deleting transcoded file: {processFile}");
+            File.Delete(processFile);
+        }
+
+        if (srt && srtSubtitle != null)
+        {
+            var mediaFileName = outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile);
+            consoleLog.LogDebug($"Media file name: {mediaFileName}");
+            var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
+            consoleLog.LogDebug($"Output directory: {outputDir}");
+            if (string.IsNullOrEmpty(mediaFileName))
+            {
+                consoleLog.LogDebug("Media file name is empty, using 'output' as the file name.");
+                mediaFileName = "output";
+            }
+
+            var outputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile) + ".srt");
+            consoleLog.Log($"Writing SRT file: {outputFile}");
+            File.WriteAllText(outputFile, srtSubtitle.ToString());
+        }
+        else
+        {
+            consoleLog.LogDebug("Not writing SRT file.");
+        }
+
+        whisperModel.Dispose();
+        processor.Dispose();
     }
 
     /// <summary>Generates the context parameters file.</summary>
@@ -131,15 +198,54 @@ public class WhisperCommands
             _ => throw new ArgumentOutOfRangeException(nameof(defaultSamplingStrategy)),
         };
     }
+
+    private ILogger SetupLogger(string name, bool useConsoleLogger = false)
+    {
+        using var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddDebug();
+            if (useConsoleLogger)
+            {
+                builder.AddSimpleConsole(options =>
+                {
+                    options.SingleLine = true;
+                });
+            }
+        });
+        return loggerFactory.CreateLogger(name);
+    }
+
+    private void SetupWhisperLogger(bool useConsoleLogger = false)
+    {
+        using var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddDebug();
+            if (useConsoleLogger)
+            {
+                builder.AddSimpleConsole(options =>
+                {
+                    options.SingleLine = true;
+                });
+            }
+        });
+        var logger = loggerFactory.CreateLogger("Whisper");
+        WhisperLogger.Instance.OnLog += (e) =>
+        {
+            switch (e.Level)
+            {
+                case DA.Whisper.LogLevel.Error:
+                    logger.LogError(e.Message);
+                    break;
+                case DA.Whisper.LogLevel.Info:
+                    logger.LogInformation(e.Message);
+                    break;
+                case DA.Whisper.LogLevel.Warning:
+                    logger.LogWarning(e.Message);
+                    break;
+                default:
+                    logger.LogDebug(e.Message);
+                    break;
+            }
+        };
+    }
 }
-
-// var jfk = File.OpenRead("/Users/drasticactions/Developer/Apps/DA.Whisper/external/whisper.cpp/samples/jfk.wav");
-
-// var model = WhisperModel.FromFile("/Users/drasticactions/Developer/Models/Whisper/ggml-tiny.en.bin");
-// var processor = WhisperProcessor.CreateWithDefaultGreedyStrategy(model);
-
-// var result = processor.ProcessAsync(jfk);
-// await foreach (var segment in result)
-// {
-//     Console.WriteLine(segment);
-// }

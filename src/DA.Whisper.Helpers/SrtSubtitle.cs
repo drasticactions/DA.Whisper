@@ -53,6 +53,22 @@ public class SrtSubtitle
         this.Lines.Add(line);
     }
 
+    /// <summary>
+    /// Adds a segment to the subtitle.
+    /// </summary>
+    /// <param name="segment">The segment.</param>
+    public void AddSegment(SegmentData segment)
+    {
+        SrtSubtitleLine line = new SrtSubtitleLine
+        {
+            LineNumber = this.Lines.Count + 1,
+            Start = segment.Start,
+            End = segment.End,
+            Text = segment.Text,
+        };
+        this.AddLine(line);
+    }
+
     /// <inheritdoc/>
     public override string ToString()
     {

@@ -33,18 +33,19 @@ public class FFMpegTranscodeService : ITranscodeService, IDisposable
     public string BasePath => this.basePath;
 
     /// <inheritdoc/>
-    public async Task<string> ProcessFile(string file)
+    public async Task<(string FilePath, bool Transcoded)> ProcessFile(string file)
     {
         var mediaInfo = await FFmpeg.GetMediaInfo(file);
         this.logger?.LogInformation($"Processing file: {file}");
         var audioStream = mediaInfo.AudioStreams.FirstOrDefault();
         if (audioStream is null)
         {
-            this.logger?.LogInformation("No audio stream found.");
-            return string.Empty;
+            this.logger?.LogError("No audio stream found.");
+            throw new InvalidOperationException("No audio stream found.");
         }
 
-        if (audioStream.SampleRate != 16000)
+        var shouldTranscode = audioStream.Codec != "pcm_s16le" || audioStream.SampleRate != 16000;
+        if (shouldTranscode)
         {
             var outputfile = Path.Combine(this.basePath, $"{this.generatedFilename ?? Path.GetRandomFileName()}.wav");
             var result = await FFmpeg.Conversions.New()
@@ -57,14 +58,14 @@ public class FFMpegTranscodeService : ITranscodeService, IDisposable
             if (result is null)
             {
                 this.logger?.LogError("FFMpeg failed to transcode file.");
-                return string.Empty;
+                throw new InvalidOperationException("FFMpeg failed to transcode file.");
             }
 
             this.logger?.LogInformation($"Transcoded file to: {outputfile}");
-            return outputfile;
+            return (outputfile, true);
         }
 
-        return file;
+        return (file, false);
     }
 
     /// <inheritdoc/>

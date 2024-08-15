@@ -44,6 +44,20 @@ public sealed class WhisperModel : IDisposable
     }
 
     /// <summary>
+    /// Gets a value indicating whether the Whisper model is initialized.
+    /// </summary>
+    public bool IsInitialized
+    {
+        get
+        {
+            unsafe
+            {
+                return this.Context is not null && ((IntPtr)this.Context) != IntPtr.Zero;
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets the context parameters.
     /// </summary>
     internal ContextParams ContextParams { get; }
@@ -91,16 +105,19 @@ public sealed class WhisperModel : IDisposable
     /// </summary>
     /// <param name="modelPath">The path to the Whisper model file.</param>
     /// <param name="contextParams">The context parameters for the Whisper model.</param>
-    /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
-    public static WhisperModel? TryFromFileWithParameters(string modelPath, ContextParams contextParams)
+    /// <param name="model">The WhisperModel.</param>
+    /// <returns>Bool if model was initalized.</returns>
+    public static bool TryFromFileWithParameters(string modelPath, ContextParams contextParams, out WhisperModel? model)
     {
         try
         {
-            return new WhisperModel(modelPath, contextParams);
+            model = new WhisperModel(modelPath, contextParams);
+            return model?.IsInitialized ?? false;
         }
         catch (Exception)
         {
-            return null;
+            model = null;
+            return false;
         }
     }
 

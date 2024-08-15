@@ -18,6 +18,6 @@ public interface ITranscodeService : IDisposable
     /// Process file.
     /// </summary>
     /// <param name="filePath">File Path.</param>
-    /// <returns>Path to transcoded file.</returns>
-    Task<string> ProcessFile(string filePath);
+    /// <returns>Filepath and Transcoded.</returns>
+    Task<(string FilePath, bool Transcoded)> ProcessFile(string filePath);
 }

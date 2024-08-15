@@ -92,16 +92,19 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
     /// </summary>
     /// <param name="model">The Whisper model.</param>
     /// <param name="fullParams">The full parameters.</param>
-    /// <returns>The created <see cref="WhisperProcessor"/> instance.</returns>
-    public static WhisperProcessor? TryCreateWithParams(WhisperModel model, FullParams fullParams)
+    /// <param name="processor">The created <see cref="WhisperProcessor"/> instance.</param>
+    /// <returns>Bool if created.</returns>
+    public static bool TryCreateWithParams(WhisperModel model, FullParams fullParams, out WhisperProcessor? processor)
     {
         try
         {
-            return new WhisperProcessor(model, fullParams);
+            processor = new WhisperProcessor(model, fullParams);
+            return true;
         }
         catch (Exception)
         {
-            return null;
+            processor = null;
+            return false;
         }
     }
 
@@ -389,7 +392,7 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
 
             if (!string.IsNullOrEmpty(textAnsi))
             {
-                var eventHandlerArgs = new SegmentData(textAnsi, t0, t1, minimumProbability, maximumProbability, (float)(sumProbability / numberOfTokens), language!);
+                var eventHandlerArgs = new SegmentData(textAnsi.Trim(), t0, t1, minimumProbability, maximumProbability, (float)(sumProbability / numberOfTokens), language!);
 
                 this.onSegmentEventHandler?.Invoke(eventHandlerArgs);
                 if (this.cancellationToken?.IsCancellationRequested ?? false)
