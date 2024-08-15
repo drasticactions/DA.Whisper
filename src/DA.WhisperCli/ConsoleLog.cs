@@ -14,6 +14,10 @@ public class ConsoleLog
     private ILogger logger;
     private bool verbose;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConsoleLog"/> class.
+    /// </summary>
+    /// <param name="verbose">Verbose logging.</param>
     public ConsoleLog(bool verbose)
     {
         this.verbose = verbose;
