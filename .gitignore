@@ -14,7 +14,7 @@ whisper_ffi.rs
 xcuserdata/
 *.xcscmblueprint
 *.xccheckout
-
+models/
 runtime/*/*
 build/
 DerivedData/

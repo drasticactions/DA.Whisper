@@ -14,6 +14,8 @@ namespace DA.Whisper;
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(FullParams))]
 [JsonSerializable(typeof(ContextParams))]
+[JsonSerializable(typeof(SegmentData))]
+[JsonSerializable(typeof(List<SegmentData>))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }

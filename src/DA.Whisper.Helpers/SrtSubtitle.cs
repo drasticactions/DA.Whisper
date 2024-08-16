@@ -44,6 +44,22 @@ public class SrtSubtitle
     public List<SrtSubtitleLine> Lines { get; set; } = new List<SrtSubtitleLine>();
 
     /// <summary>
+    /// Converts a list of segments to a subtitle.
+    /// </summary>
+    /// <param name="segments">Segments.</param>
+    /// <returns>From SrtSubtitle.</returns>
+    public static SrtSubtitle FromSegments(List<SegmentData> segments)
+    {
+        SrtSubtitle subtitle = new SrtSubtitle();
+        foreach (var segment in segments)
+        {
+            subtitle.AddSegment(segment);
+        }
+
+        return subtitle;
+    }
+
+    /// <summary>
     /// Add a line to the subtitle.
     /// </summary>
     /// <param name="line">The line.</param>

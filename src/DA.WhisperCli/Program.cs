@@ -28,10 +28,11 @@ public class WhisperCommands
     /// <param name="defaultSamplingStrategy">-s, Default Sampling Strategy, ignored if parameter file is used.</param>
     /// <param name="transcodeFile">-t, Transcode the file using ffmpeg to a format that Whisper can process. Requires ffmpeg to be installed.</param>
     /// <param name="printTimestamps">-ts, Print timestamps with the text.</param>
-    /// <param name="srt">-srt, Output the text to a file in SRT format.</param>
+    /// <param name="outputFormats">-f, Output the text to files.</param>
     /// <param name="outputDirectory">-o, Output directory for the SRT file, defaults to the current working directory.</param>
     /// <param name="outputFilename">-of, Output file name for the SRT file, defaults to the name of the media file if available.</param>
     /// <param name="verbose">-v, Verbose logging.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
     /// <returns>Task.</returns>
     [Command("transcribe")]
     public async Task TranscribeAsync(
@@ -42,11 +43,13 @@ public class WhisperCommands
         SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy,
         bool transcodeFile = true,
         bool printTimestamps = false,
-        bool srt = false,
+        string[]? outputFormats = default,
         string? outputDirectory = default,
         string? outputFilename = default,
-        bool verbose = false)
+        bool verbose = false,
+        CancellationToken cancellationToken = default)
     {
+        outputFormats = outputFormats ?? Array.Empty<string>();
         var consoleLog = new ConsoleLog(verbose);
         this.SetupWhisperLogger(verbose);
         var ffmpeg = new FFMpegTranscodeService(logger: this.SetupLogger("ffmpeg", verbose));
@@ -76,31 +79,51 @@ public class WhisperCommands
             return;
         }
 
+        if (!File.Exists(mediaFile))
+        {
+            consoleLog.LogError("Media file does not exist.");
+            return;
+        }
+
         var transcoded = false;
         var processFile = mediaFile;
         if (transcodeFile)
         {
-            var transcodeResult = await ffmpeg.ProcessFile(mediaFile);
-            if (transcodeResult.Transcoded)
+            try
             {
-                processFile = transcodeResult.FilePath;
-                transcoded = true;
+                var transcodeResult = await ffmpeg.ProcessFile(mediaFile);
+                if (transcodeResult.Transcoded)
+                {
+                    processFile = transcodeResult.FilePath;
+                    transcoded = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                consoleLog.LogError($"Error transcoding file: {ex.Message}");
+                return;
             }
         }
 
         using var processFileStream = File.OpenRead(processFile);
-        var result = processor.ProcessAsync(processFileStream);
-        SrtSubtitle? srtSubtitle = null;
-        if (srt)
-        {
-            srtSubtitle = new SrtSubtitle();
-        }
+        var result = processor.ProcessAsync(processFileStream, cancellationToken);
+        List<SegmentData>? segments = outputFormats?.Length > 0 ? new() : null;
+        var supportOutputFormats = outputFormats?.Length > 0;
+        var enumOutputFormats = outputFormats?.Select(o => Enum.Parse<OutputFormat>(o, true)).ToArray();
+        var srt = enumOutputFormats?.Contains(OutputFormat.SRT) ?? false;
+        var json = enumOutputFormats?.Contains(OutputFormat.Json) ?? false;
 
         await foreach (var segment in result)
         {
             var text = printTimestamps ? $"[{segment.Start} - {segment.End}] {segment.Text}" : segment.Text;
             consoleLog.Log(text);
-            srtSubtitle?.AddSegment(segment);
+            segments?.Add(segment);
+        }
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            consoleLog.Log("Processing was cancelled.");
+            return;
         }
 
         if (transcoded)
@@ -109,25 +132,38 @@ public class WhisperCommands
             File.Delete(processFile);
         }
 
-        if (srt && srtSubtitle != null)
+        var mediaFileName = outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile);
+        consoleLog.LogDebug($"Media file name: {mediaFileName}");
+        if (string.IsNullOrEmpty(mediaFileName))
         {
-            var mediaFileName = outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile);
-            consoleLog.LogDebug($"Media file name: {mediaFileName}");
-            var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
-            consoleLog.LogDebug($"Output directory: {outputDir}");
-            if (string.IsNullOrEmpty(mediaFileName))
-            {
-                consoleLog.LogDebug("Media file name is empty, using 'output' as the file name.");
-                mediaFileName = "output";
-            }
+            consoleLog.LogDebug("Media file name is empty, using 'output' as the file name.");
+            mediaFileName = "output";
+        }
 
-            var outputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile) + ".srt");
+        var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
+
+        if (srt && segments != null)
+        {
+            var srtSubtitle = SrtSubtitle.FromSegments(segments);
+
+            var outputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFileName) + ".srt");
             consoleLog.Log($"Writing SRT file: {outputFile}");
             File.WriteAllText(outputFile, srtSubtitle.ToString());
         }
         else
         {
             consoleLog.LogDebug("Not writing SRT file.");
+        }
+
+        if (json && segments != null)
+        {
+            var jsonOutputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFileName) + ".json");
+            consoleLog.Log($"Writing JSON file: {jsonOutputFile}");
+            File.WriteAllText(jsonOutputFile, segments.ToJson());
+        }
+        else
+        {
+            consoleLog.LogDebug("Not writing JSON file.");
         }
 
         whisperModel.Dispose();
