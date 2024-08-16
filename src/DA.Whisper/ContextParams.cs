@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DA.Whisper;
@@ -131,6 +132,25 @@ public class ContextParams
     /// </summary>
     /// <returns>A new instance of <see cref="ContextParams"/> with default parameters.</returns>
     public static ContextParams FromDefault() => new ContextParams();
+
+    /// <summary>
+    /// Converts the <see cref="ContextParams"/> object to a JSON string.
+    /// </summary>
+    /// <param name="json">JSON string.</param>
+    /// <returns><see cref="ContextParams"/>.</returns>
+    public static ContextParams FromJson(string json)
+    {
+        return JsonSerializer.Deserialize<ContextParams>(json, SourceGenerationContext.Default.ContextParams) ?? new ContextParams();
+    }
+
+    /// <summary>
+    /// Converts the <see cref="FullParams"/> object to a JSON string.
+    /// </summary>
+    /// <returns>JSON string of full params.</returns>
+    public string ToJson()
+    {
+        return JsonSerializer.Serialize(this, SourceGenerationContext.Default.FullParams);
+    }
 
     /// <inheritdoc/>
     public override string ToString()

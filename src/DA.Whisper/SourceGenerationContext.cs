@@ -3,9 +3,8 @@
 // </copyright>
 
 using System.Text.Json.Serialization;
-using DA.Whisper;
 
-namespace DA.WhisperCli;
+namespace DA.Whisper;
 
 /// <summary>
 /// Message Source Generation Context.

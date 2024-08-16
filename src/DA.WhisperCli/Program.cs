@@ -172,7 +172,7 @@ public class WhisperCommands
     [Command("generate-context-file")]
     public void GenerateContextFile(string outputName = "context_params.json")
     {
-        File.WriteAllText(outputName, JsonSerializer.Serialize(ContextParams.FromDefault(), SourceGenerationContext.Default.FullParams));
+        File.WriteAllText(outputName, ContextParams.FromDefault().ToJson());
     }
 
     /// <summary>Generates the parameter file.</summary>
@@ -188,7 +188,7 @@ public class WhisperCommands
             _ => throw new ArgumentOutOfRangeException(nameof(samplingStrategy)),
         };
 
-        File.WriteAllText(outputName, JsonSerializer.Serialize(fullParams, SourceGenerationContext.Default.FullParams));
+        File.WriteAllText(outputName, fullParams.ToJson());
     }
 
     private ContextParams? GetContextParams(string? contextFile)
@@ -197,7 +197,7 @@ public class WhisperCommands
         {
             try
             {
-                return JsonSerializer.Deserialize<ContextParams>(File.ReadAllText(contextFile), SourceGenerationContext.Default.ContextParams);
+                return ContextParams.FromJson(File.ReadAllText(contextFile));
             }
             catch (Exception ex)
             {
@@ -215,7 +215,7 @@ public class WhisperCommands
         {
             try
             {
-                return JsonSerializer.Deserialize<FullParams>(File.ReadAllText(parameterFile), SourceGenerationContext.Default.FullParams);
+                return FullParams.FromJson(File.ReadAllText(parameterFile));
             }
             catch (Exception ex)
             {

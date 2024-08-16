@@ -23,7 +23,6 @@ public class ConsoleLog
         this.verbose = verbose;
         this.logger = LoggerFactory.Create(builder =>
         {
-            builder.AddDebug();
             if (verbose)
             {
                 builder.AddSimpleConsole(options => { options.SingleLine = true; });

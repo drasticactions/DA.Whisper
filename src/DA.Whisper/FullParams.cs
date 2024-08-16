@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DA.Whisper;
@@ -432,12 +433,31 @@ public class FullParams
     }
 
     /// <summary>
+    /// Converts the <see cref="FullParams"/> object to a JSON string.
+    /// </summary>
+    /// <param name="json">JSON string.</param>
+    /// <returns><see cref="FullParams"/>.</returns>
+    public static FullParams FromJson(string json)
+    {
+        return JsonSerializer.Deserialize<FullParams>(json, SourceGenerationContext.Default.FullParams) ?? FullParams.FromGreedyStrategy();
+    }
+
+    /// <summary>
     /// Creates a new instance of <see cref="FullParams"/> with the BeamSearch sampling strategy.
     /// </summary>
     /// <returns>A new instance of <see cref="FullParams"/> with the BeamSearch sampling strategy.</returns>
     public static FullParams FromBeamSearchStrategy()
     {
         return new FullParams(SamplingStrategy.BeamSearch);
+    }
+
+    /// <summary>
+    /// Converts the <see cref="FullParams"/> object to a JSON string.
+    /// </summary>
+    /// <returns>JSON string of full params.</returns>
+    public string ToJson()
+    {
+        return JsonSerializer.Serialize(this, SourceGenerationContext.Default.FullParams);
     }
 
     /// <summary>
