@@ -10,6 +10,11 @@ namespace DA.Whisper;
 public enum GgmlType
 {
     /// <summary>
+    /// Unknown model.
+    /// </summary>
+    Unknown,
+
+    /// <summary>
     /// Tiny model.
     /// </summary>
     Tiny,

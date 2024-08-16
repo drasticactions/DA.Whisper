@@ -11,19 +11,14 @@ namespace DA.Whisper;
 public enum QuantizationType
 {
     /// <summary>
+    /// Unknown quantization.
+    /// </summary>
+    Unknown,
+
+    /// <summary>
     /// No quantization.
     /// </summary>
     NoQuantization,
-
-    /// <summary>
-    /// Quantization 4_0.
-    /// </summary>
-    Q4_0,
-
-    /// <summary>
-    /// Quantization 4_1.
-    /// </summary>
-    Q4_1,
 
     /// <summary>
     /// Quantization 5_0.

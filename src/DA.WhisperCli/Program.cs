@@ -134,6 +134,39 @@ public class WhisperCommands
         processor.Dispose();
     }
 
+    /// <summary>Get all models available for download.</summary>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    [Command("all-models")]
+    public void ShowAllModels(bool verbose = false)
+    {
+        var consoleLog = new ConsoleLog(verbose);
+        var modelService = new WhisperModelService();
+        consoleLog.LogDebug($"Cache Location: {WhisperStatic.DefaultPath}");
+        foreach (var model in modelService.AllModels)
+        {
+            consoleLog.Log($"[{model.GgmlType} {model.QuantizationType}]");
+        }
+    }
+
+    /// <summary>Get available models that have been downloaded and cached.</summary>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    [Command("available-models")]
+    public void ShowAvailableModels(bool verbose = false)
+    {
+        var consoleLog = new ConsoleLog(verbose);
+        var modelService = new WhisperModelService();
+        consoleLog.LogDebug($"Cache Location: {WhisperStatic.DefaultPath}");
+        foreach (var model in modelService.AvailableModels)
+        {
+            consoleLog.Log($"[{model.GgmlType} {model.QuantizationType}]");
+        }
+
+        if (modelService.AvailableModels.Count == 0)
+        {
+            consoleLog.Log("No models available.");
+        }
+    }
+
     /// <summary>Generates the context parameters file.</summary>
     /// <param name="outputName">Output file name.</param>
     [Command("generate-context-file")]
