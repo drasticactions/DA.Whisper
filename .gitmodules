@@ -4,3 +4,6 @@
 [submodule "external/Xabe.FFmpeg"]
 	path = external/Xabe.FFmpeg
 	url = git@github.com:drasticactions/Xabe.FFmpeg.git
+[submodule "external/DA.UI"]
+	path = external/DA.UI
+	url = git@github.com:drasticactions/DA.UI.git
