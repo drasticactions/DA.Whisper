@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DA.Whisper\DA.Whisper.csproj" />
     <ProjectReference Include="..\DA.Whisper.Helpers\DA.Whisper.Helpers.csproj" />
+    <ProjectReference Include="..\..\external\Xabe.FFmpeg\src\Xabe.FFmpeg\Xabe.FFmpeg.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -14,6 +15,5 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-	  <PackageReference Include="Xabe.FFmpeg" Version="5.2.6" />
 	</ItemGroup>
 </Project>
