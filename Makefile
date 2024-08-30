@@ -9,7 +9,6 @@ clean:
 
 binding:
 	cd $(ROOT)/bindings/whisper-bindings && cargo build --release
-	cd $(ROOT)/bindings/llama-bindings && cargo run
 
 macos:
 	rm -rf build/macos
