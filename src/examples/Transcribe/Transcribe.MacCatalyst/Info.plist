@@ -3,36 +3,29 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDisplayName</key>
-    <string>Transcribe.iOS</string>
+    <string>Transcribe.MacCatalyst</string>
     <key>CFBundleIdentifier</key>
-    <string>com.companyname.Transcribe.iOS</string>
+    <string>com.companyname.Transcribe.MacCatalyst</string>
     <key>CFBundleShortVersionString</key>
     <string>1.0</string>
     <key>CFBundleVersion</key>
     <string>1.0</string>
-    <key>LSRequiresIPhoneOS</key>
-    <true/>
+    <!-- The App store requires that ITSAppUsesNonExemptEncryption to be set -->
+    <!-- Please consult https://developer.apple.com/documentation/bundleresources/information_property_list/itsappusesnonexemptencryption -->
+    <!-- <key>ITSAppUsesNonExemptEncryption</key> -->
+    <!-- Please indicate <true/> or <false/> here. -->
+
+    <!-- Specify the category for your app here. -->
+    <!-- Please consult https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype -->
+    <!-- <key>LSApplicationCategoryType</key> -->
+    <!-- <string>public.app-category.YOUR-CATEGORY-HERE</string> -->
     <key>UIDeviceFamily</key>
     <array>
-        <integer>1</integer>
-        <integer>2</integer>
-    </array>
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
-    <key>UIRequiredDeviceCapabilities</key>
-    <array>
-        <string>armv7</string>
+        <integer>6</integer>
     </array>
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    <key>UISupportedInterfaceOrientations~ipad</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
@@ -41,4 +34,4 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>This app requires microphone access in order to transcribe speech</string>
 </dict>
-</plist>
+</plist> 

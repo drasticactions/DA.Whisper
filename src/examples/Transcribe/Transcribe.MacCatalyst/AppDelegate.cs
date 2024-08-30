@@ -4,7 +4,7 @@
 
 using Transcribe.Apple;
 
-namespace Transcribe.IOS;
+namespace Transcribe.MacCatalyst;
 
 /// <summary>
 /// App Delegate.
@@ -12,9 +12,7 @@ namespace Transcribe.IOS;
 [Register("AppDelegate")]
 public class AppDelegate : UIApplicationDelegate
 {
-    /// <summary>
-    /// Gets or sets the Window.
-    /// </summary>
+    /// <inheritdoc/>
     public override UIWindow? Window
     {
         get;

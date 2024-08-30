@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\external\DA.UI\src\DA.UI.iOS\DA.UI.iOS.csproj" />
+    <ProjectReference Include="..\..\..\..\external\DA.UI\src\DA.UI\DA.UI.csproj" />
+    <ProjectReference Include="..\..\..\DA.Whisper\DA.Whisper.csproj" />
+  </ItemGroup>
+
+</Project>

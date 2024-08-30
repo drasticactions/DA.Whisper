@@ -9,6 +9,8 @@
     <RootNamespace>Transcribe.IOS</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\external\DA.UI\src\DA.UI.iOS\DA.UI.iOS.csproj" />
     <ProjectReference Include="..\..\..\DA.Whisper\DA.Whisper.csproj" />
+    <ProjectReference Include="..\Transcribe.Apple\Transcribe.Apple.csproj" />
   </ItemGroup>
 </Project>
