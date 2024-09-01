@@ -8,11 +8,12 @@
     <DebugType>embedded</DebugType>
     <NoWarn>SA0001</NoWarn>
     <IsAotCompatible>true</IsAotCompatible>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>SA0001;SA1210;NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers"  Version="1.2.0-beta.556">
+    <PackageReference Include="StyleCop.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

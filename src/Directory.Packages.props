@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+	  <PackageVersion Include="LibVLCSharp" Version="3.9.0" />
+    <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+    <PackageVersion Include="Downloader" Version="3.1.2" />
+    <PackageVersion Include="ConsoleAppFramework" Version="5.2.3" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+  </ItemGroup>
+</Project>
