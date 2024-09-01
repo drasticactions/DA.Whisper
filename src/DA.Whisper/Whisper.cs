@@ -10,11 +10,11 @@ namespace DA.Whisper;
 public static class Whisper
 {
     /// <summary>
-    /// Gets the native Whisper version from the bundled library.
+    /// Gets the native Whisper system info from the bundled library.
     /// Throws a DllNotFoundException if the library is not found.
     /// </summary>
     /// <returns>String of the system version.</returns>
-    public static string GetSystemVersion()
+    public static string GetSystemInfo()
     {
         return NativeMethods.GetWhisperSystemInfo();
     }

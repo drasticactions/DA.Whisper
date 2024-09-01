@@ -21,12 +21,12 @@ public class WhisperCommands
 #pragma warning restore SA1649 // File name should match first type name
 {
     /// <summary>
-    /// Gets the native Whisper version from the bundled library.
+    /// Gets the native Whisper system info from the bundled library.
     /// </summary>
-    [Command("version-info")]
-    public void GetVersionInfo()
+    [Command("system-info")]
+    public void GetSystemInfo()
     {
-        Console.WriteLine(Whisper.GetSystemVersion());
+        Console.WriteLine(Whisper.GetSystemInfo());
     }
 
     /// <summary>Transcribe media file to text.</summary>
