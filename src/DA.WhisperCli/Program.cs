@@ -20,6 +20,15 @@ app.Run(args);
 public class WhisperCommands
 #pragma warning restore SA1649 // File name should match first type name
 {
+    /// <summary>
+    /// Gets the native Whisper version from the bundled library.
+    /// </summary>
+    [Command("version-info")]
+    public void GetVersionInfo()
+    {
+        Console.WriteLine(Whisper.GetSystemVersion());
+    }
+
     /// <summary>Transcribe media file to text.</summary>
     /// <param name="mediaFile">Media file to transcribe.</param>
     /// <param name="model">-m, Whisper Model.</param>
