@@ -13,7 +13,7 @@ namespace DA.Whisper
 {
     internal static unsafe partial class NativeMethods
     {
-#if IOS || MACOS || TVOS || MACCATALST
+#if IOS || MACOS || TVOS || MACCATALYST
         const string __DllName = "__Internal";
 #else
         const string __DllName = "whisper";
