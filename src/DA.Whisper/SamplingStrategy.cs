@@ -12,10 +12,10 @@ public enum SamplingStrategy
     /// <summary>
     /// The greedy sampling strategy.
     /// </summary>
-    Greedy = 0,
+    Greedy = (int)whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY,
 
     /// <summary>
     /// The beam search sampling strategy.
     /// </summary>
-    BeamSearch = 1,
+    BeamSearch = (int)whisper_sampling_strategy.WHISPER_SAMPLING_BEAM_SEARCH,
 }

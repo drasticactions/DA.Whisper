@@ -10,17 +10,22 @@ namespace DA.Whisper;
 public enum LogLevel
 {
     /// <summary>
+    /// Indicates a debug log level.
+    /// </summary>
+    Debug = (int)ggml_log_level.GGML_LOG_LEVEL_DEBUG,
+
+    /// <summary>
     /// Indicates an error log level.
     /// </summary>
-    Error = 2,
+    Error = (int)ggml_log_level.GGML_LOG_LEVEL_ERROR,
 
     /// <summary>
     /// Indicates a warning log level.
     /// </summary>
-    Warning = 3,
+    Warning = (int)ggml_log_level.GGML_LOG_LEVEL_WARN,
 
     /// <summary>
     /// Indicates an information log level.
     /// </summary>
-    Info = 4,
+    Info = (int)ggml_log_level.GGML_LOG_LEVEL_INFO,
 }
