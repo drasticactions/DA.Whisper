@@ -3,6 +3,9 @@ fn main() {
         .header("../../external/whisper.cpp/include/whisper.h")
         .clang_arg("-I../../external/whisper.cpp/ggml/include")
         .allowlist_function(".*whisper.*")
+        .default_enum_style(bindgen::EnumVariation::Rust {
+            non_exhaustive: false,
+        })
         .generate().unwrap()
         .write_to_file("bindings.rs").unwrap();
 

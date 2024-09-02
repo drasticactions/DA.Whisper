@@ -5,7 +5,6 @@
 #pragma warning disable CS8500
 #pragma warning disable CS8981
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 
@@ -236,10 +235,10 @@ namespace DA.Whisper
         internal static extern whisper_context_params whisper_context_default_params();
 
         [DllImport(__DllName, EntryPoint = "whisper_full_default_params_by_ref", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        internal static extern whisper_full_params* whisper_full_default_params_by_ref(int strategy);
+        internal static extern whisper_full_params* whisper_full_default_params_by_ref(whisper_sampling_strategy strategy);
 
         [DllImport(__DllName, EntryPoint = "whisper_full_default_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        internal static extern whisper_full_params whisper_full_default_params(int strategy);
+        internal static extern whisper_full_params whisper_full_default_params(whisper_sampling_strategy strategy);
 
         [DllImport(__DllName, EntryPoint = "whisper_full", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         internal static extern int whisper_full(whisper_context* ctx, whisper_full_params @params, float* samples, int n_samples);
@@ -331,7 +330,7 @@ namespace DA.Whisper
         internal static extern byte* whisper_bench_ggml_mul_mat_str(int n_threads);
 
         [DllImport(__DllName, EntryPoint = "whisper_log_set", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        internal static extern void whisper_log_set(delegate* unmanaged[Cdecl]<int, byte*, void*, void> log_callback, void* user_data);
+        internal static extern void whisper_log_set(delegate* unmanaged[Cdecl]<ggml_log_level, byte*, void*, void> log_callback, void* user_data);
 
 
     }
@@ -369,7 +368,7 @@ namespace DA.Whisper
         [MarshalAs(UnmanagedType.U1)] public bool flash_attn;
         public int gpu_device;
         [MarshalAs(UnmanagedType.U1)] public bool dtw_token_timestamps;
-        public int dtw_aheads_preset;
+        public whisper_alignment_heads_preset dtw_aheads_preset;
         public int dtw_n_top;
         public whisper_aheads dtw_aheads;
         public nuint dtw_mem_size;
@@ -402,14 +401,14 @@ namespace DA.Whisper
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe partial struct whisper_grammar_element
     {
-        public int type_;
+        public whisper_gretype type_;
         public uint value;
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe partial struct whisper_full_params
     {
-        public int strategy;
+        public whisper_sampling_strategy strategy;
         public int n_threads;
         public int n_max_text_ctx;
         public int offset_ms;
@@ -477,6 +476,49 @@ namespace DA.Whisper
         public float patience;
     }
 
+
+    internal enum ggml_log_level : uint
+    {
+        GGML_LOG_LEVEL_ERROR = 2,
+        GGML_LOG_LEVEL_WARN = 3,
+        GGML_LOG_LEVEL_INFO = 4,
+        GGML_LOG_LEVEL_DEBUG = 5,
+    }
+
+    internal enum whisper_alignment_heads_preset : uint
+    {
+        WHISPER_AHEADS_NONE = 0,
+        WHISPER_AHEADS_N_TOP_MOST = 1,
+        WHISPER_AHEADS_CUSTOM = 2,
+        WHISPER_AHEADS_TINY_EN = 3,
+        WHISPER_AHEADS_TINY = 4,
+        WHISPER_AHEADS_BASE_EN = 5,
+        WHISPER_AHEADS_BASE = 6,
+        WHISPER_AHEADS_SMALL_EN = 7,
+        WHISPER_AHEADS_SMALL = 8,
+        WHISPER_AHEADS_MEDIUM_EN = 9,
+        WHISPER_AHEADS_MEDIUM = 10,
+        WHISPER_AHEADS_LARGE_V1 = 11,
+        WHISPER_AHEADS_LARGE_V2 = 12,
+        WHISPER_AHEADS_LARGE_V3 = 13,
+    }
+
+    internal enum whisper_gretype : uint
+    {
+        WHISPER_GRETYPE_END = 0,
+        WHISPER_GRETYPE_ALT = 1,
+        WHISPER_GRETYPE_RULE_REF = 2,
+        WHISPER_GRETYPE_CHAR = 3,
+        WHISPER_GRETYPE_CHAR_NOT = 4,
+        WHISPER_GRETYPE_CHAR_RNG_UPPER = 5,
+        WHISPER_GRETYPE_CHAR_ALT = 6,
+    }
+
+    internal enum whisper_sampling_strategy : uint
+    {
+        WHISPER_SAMPLING_GREEDY = 0,
+        WHISPER_SAMPLING_BEAM_SEARCH = 1,
+    }
 
 
 }

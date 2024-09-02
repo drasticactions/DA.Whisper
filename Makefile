@@ -9,6 +9,7 @@ clean:
 
 binding:
 	cd $(ROOT)/bindings/whisper-bindings && cargo build --release
+	cd $(ROOT)/bindings/whisper-bindings && cargo run
 
 apple: macos ios_simulator_x64 ios_simulator_arm64 lipo_ios_simulator ios maccatalyst_x64 maccatalyst_arm64 lipo_maccatalyst
 
