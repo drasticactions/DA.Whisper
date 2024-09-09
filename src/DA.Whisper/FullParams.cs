@@ -25,7 +25,10 @@ public class FullParams
     [JsonConstructor]
     public FullParams()
     {
-        this.@params = NativeMethods.whisper_full_default_params((int)SamplingStrategy.Greedy);
+        unsafe
+        {
+            this.@params = NativeMethods.whisper_full_default_params((int)SamplingStrategy.Greedy);
+        }
     }
 
     /// <summary>
@@ -34,7 +37,10 @@ public class FullParams
     /// <param name="strategy">The sampling strategy.</param>
     internal FullParams(SamplingStrategy strategy)
     {
-        this.@params = NativeMethods.whisper_full_default_params((whisper_sampling_strategy)strategy);
+        unsafe
+        {
+            this.@params = NativeMethods.whisper_full_default_params((whisper_sampling_strategy)strategy);
+        }
     }
 
     /// <summary>

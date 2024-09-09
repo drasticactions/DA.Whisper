@@ -55,6 +55,20 @@ public sealed class WhisperModel : IDisposable
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="WhisperModel"/> class with the specified model and context parameters.
+    /// </summary>
+    /// <param name="model">The Whisper Model Stream.</param>
+    private WhisperModel(byte[] model)
+    {
+        unsafe
+        {
+            this.pinnedBuffer = GCHandle.Alloc(model, GCHandleType.Pinned);
+            var bufferLength = new UIntPtr((uint)model.Length);
+            this.Context = NativeMethods.InitFromBuffer((void*)this.pinnedBuffer!.Value.AddrOfPinnedObject(), bufferLength);
+        }
+    }
+
+    /// <summary>
     /// Finalizes an instance of the <see cref="WhisperModel"/> class.
     /// </summary>
     ~WhisperModel()
@@ -79,7 +93,7 @@ public sealed class WhisperModel : IDisposable
     /// <summary>
     /// Gets the context parameters.
     /// </summary>
-    internal ContextParams ContextParams { get; }
+    internal ContextParams? ContextParams { get; }
 
     /// <summary>
     /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model path.
@@ -127,7 +141,7 @@ public sealed class WhisperModel : IDisposable
     {
         try
         {
-            return new WhisperModel(model, ContextParams.FromDefault());
+            return new WhisperModel(model);
         }
         catch (Exception)
         {

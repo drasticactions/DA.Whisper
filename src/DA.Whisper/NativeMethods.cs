@@ -40,6 +40,15 @@ public static unsafe partial class NativeMethods
         }
     }
 
+    internal static unsafe whisper_context* InitFromBuffer(void* bufferArray, nuint bufferLength)
+    {
+        unsafe
+        {
+            var context = NativeMethods.whisper_init_from_buffer_no_state((void*)bufferArray, (nuint)bufferLength);
+            return context;
+        }
+    }
+
     /// <summary>
     /// Gets the system information of the whisper library.
     /// </summary>

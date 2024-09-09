@@ -34,6 +34,7 @@
 
     private async void OnButtonClick(MouseEventArgs e)
     {
+        var test = NativeMethods.whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY);
        await JsRuntime.InvokeVoidAsync("alert", $"{DA.Whisper.Whisper.GetSystemInfo()}");
     }
 
