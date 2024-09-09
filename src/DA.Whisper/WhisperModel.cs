@@ -26,12 +26,26 @@ public sealed class WhisperModel : IDisposable
     /// </summary>
     /// <param name="modelPath">The path to the Whisper model file.</param>
     /// <param name="contextParams">The context parameters for the Whisper model.</param>
-    internal WhisperModel(string modelPath, ContextParams contextParams)
+    private WhisperModel(string modelPath, ContextParams contextParams)
     {
         unsafe
         {
             this.ContextParams = contextParams;
             this.Context = NativeMethods.InitFromFileWithParams(modelPath, contextParams);
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WhisperModel"/> class with the specified model and context parameters.
+    /// </summary>
+    /// <param name="model">The Whisper Model Stream.</param>
+    /// <param name="contextParams">The context parameters for the Whisper model.</param>
+    private WhisperModel(Stream model, ContextParams contextParams)
+    {
+        unsafe
+        {
+            this.ContextParams = contextParams;
+            this.Context = NativeMethods.InitFromStreamWithParams(model, contextParams);
         }
     }
 
@@ -75,6 +89,16 @@ public sealed class WhisperModel : IDisposable
     /// <summary>
     /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model path.
     /// </summary>
+    /// <param name="model">The Whisper model file.</param>
+    /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
+    public static WhisperModel FromStream(Stream model)
+    {
+        return new WhisperModel(model, ContextParams.FromDefault());
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model path.
+    /// </summary>
     /// <param name="modelPath">The path to the Whisper model file.</param>
     /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
     public static WhisperModel? TryFromFile(string modelPath)
@@ -82,6 +106,23 @@ public sealed class WhisperModel : IDisposable
         try
         {
             return new WhisperModel(modelPath, ContextParams.FromDefault());
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model.
+    /// </summary>
+    /// <param name="model">The Whisper model file.</param>
+    /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
+    public static WhisperModel? TryFromStream(Stream model)
+    {
+        try
+        {
+            return new WhisperModel(model, ContextParams.FromDefault());
         }
         catch (Exception)
         {
@@ -101,6 +142,17 @@ public sealed class WhisperModel : IDisposable
     }
 
     /// <summary>
+    /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model and context parameters.
+    /// </summary>
+    /// <param name="model">The Whisper model file.</param>
+    /// <param name="contextParams">The context parameters for the Whisper model.</param>
+    /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
+    public static WhisperModel FromStreamWithParameters(Stream model, ContextParams contextParams)
+    {
+        return new WhisperModel(model, contextParams);
+    }
+
+    /// <summary>
     /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model path and context parameters.
     /// </summary>
     /// <param name="modelPath">The path to the Whisper model file.</param>
@@ -112,6 +164,27 @@ public sealed class WhisperModel : IDisposable
         try
         {
             model = new WhisperModel(modelPath, contextParams);
+            return model?.IsInitialized ?? false;
+        }
+        catch (Exception)
+        {
+            model = null;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="WhisperModel"/> class from the specified model and context parameters.
+    /// </summary>
+    /// <param name="modelStream">The Whisper model file.</param>
+    /// <param name="contextParams">The context parameters for the Whisper model.</param>
+    /// <param name="model">The WhisperModel.</param>
+    /// <returns>Bool if model was initalized.</returns>
+    public static bool TryFromStreamWithParameters(Stream modelStream, ContextParams contextParams, out WhisperModel? model)
+    {
+        try
+        {
+            model = new WhisperModel(modelStream, contextParams);
             return model?.IsInitialized ?? false;
         }
         catch (Exception)

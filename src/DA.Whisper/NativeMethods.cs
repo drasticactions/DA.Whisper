@@ -31,6 +31,18 @@ public static unsafe partial class NativeMethods
         }
     }
 
+    internal static unsafe whisper_context* InitFromStreamWithParams(Stream model, ContextParams contextParams)
+    {
+        unsafe
+        {
+            byte* modelData = (byte*)Marshal.AllocHGlobal((int)model.Length).ToPointer();
+            var result = model.Read(new Span<byte>(modelData, (int)model.Length));
+            var context = NativeMethods.whisper_init_from_buffer_with_params_no_state(modelData, (nuint)result, contextParams.Params);
+            Marshal.FreeHGlobal((IntPtr)modelData);
+            return context;
+        }
+    }
+
     /// <summary>
     /// Gets the system information of the whisper library.
     /// </summary>

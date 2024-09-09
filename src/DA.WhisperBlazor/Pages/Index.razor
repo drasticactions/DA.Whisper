@@ -42,10 +42,30 @@
         isRunning = true;
         try
         {
+            using var modelMemoryStream = new MemoryStream();
+            var modelFile = _selectedModel!.OpenReadStream(Int32.MaxValue);
+            await modelFile.CopyToAsync(modelMemoryStream);
+            var model = WhisperModel.TryFromStream(modelMemoryStream);
+            if (model is null)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", $"Failed to create model");
+                return;
+            }
+            
+            var audioFile = _selectedAudio!.OpenReadStream(Int32.MaxValue);
+            using var memoryStream = new MemoryStream();
+            await audioFile.CopyToAsync(memoryStream);
+
+            var processor = WhisperProcessor.CreateWithDefaultGreedyStrategy(model);
+            var result = processor.ProcessAsync(memoryStream);
+            await foreach (var item in result)
+            {
+                Console.WriteLine(item.ToString());
+            }
         }
         catch
         {
-
+            throw;
         }
         finally
         {
