@@ -5,13 +5,35 @@ CMAKE_PARAMETERS=-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 clean:
 	rm -rf build
+	rm -rf output
 	find runtime -type d -mindepth 1 -exec rm -r {} +
 
 binding:
 	cd $(ROOT)/bindings/whisper-bindings && cargo build --release
 	cd $(ROOT)/bindings/whisper-bindings && cargo run
 
-apple: macos ios_simulator_x64 ios_simulator_arm64 lipo_ios_simulator ios maccatalyst_x64 maccatalyst_arm64 lipo_maccatalyst
+wasm_verify:
+	@emcc -v > /dev/null 2>&1 || (echo "Emscripten is not installed. Please install Emscripten." && exit 1)
+
+apple_verify:
+	@xcode-select -p > /dev/null 2>&1 || (echo "Xcode is not installed. Please install Xcode." && exit 1)
+
+macos_runtime_verify:
+	@echo "Checking if the macOS runtime was made..."
+	@if [ ! -f runtime/macos/libwhisper.dylib ]; then \
+		echo "The macOS runtime was not made. Please run 'make macos'."; \
+		exit 1; \
+	fi
+	@echo "The macOS runtime was made."
+
+wasm: wasm_verify
+	rm -rf build/wasm
+	emcmake cmake -S $(PROJECT_ROOT) -B build/wasm $(CMAKE_PARAMETERS)
+	cmake --build build/wasm --config $(BUILD_TYPE)
+	mkdir -p runtime/browser-wasm
+	cp build/wasm/src/libwhisper.a runtime/browser-wasm/libwhisper.a
+
+apple: apple_verify macos ios_simulator_x64 ios_simulator_arm64 lipo_ios_simulator ios maccatalyst_x64 maccatalyst_arm64 lipo_maccatalyst
 
 macos:
 	rm -rf build/macos
@@ -78,4 +100,7 @@ lipo_maccatalyst:
 	lipo -create runtime/maccatalyst-x64/libwhisper.dylib runtime/maccatalyst-arm64/libwhisper.dylib -output runtime/maccatalyst/libwhisper.dylib
 	cp $(ROOT)/build/maccatalyst-x64/bin/ggml-metal.metal runtime/maccatalyst/ggml-metal.metal
 	cp $(ROOT)/build/maccatalyst-x64/bin/ggml-common.h runtime/maccatalyst/ggml-common.h
+
+macos_debug: macos_runtime_verify
+	dotnet build $(ROOT)/src/DA.WhisperCli
 

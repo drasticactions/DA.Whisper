@@ -14,6 +14,7 @@ fn main() {
         .rust_file_header("use super::whisper::*;")     // import bindgen generated modules(struct/method)
         .csharp_dll_name("whisper")
         .csharp_namespace("DA.Whisper")
+        .csharp_class_accessibility("public")
         .csharp_dll_name_if("IOS || MACOS || TVOS || MACCATALYST", "__Internal")
         .generate_to_file("whisper_ffi.rs", "../../src/DA.Whisper/NativeMethods.g.cs")
         .unwrap();

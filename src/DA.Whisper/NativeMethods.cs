@@ -12,7 +12,7 @@ namespace DA.Whisper;
 /// <summary>
 /// Native methods.
 /// </summary>
-internal static unsafe partial class NativeMethods
+public static unsafe partial class NativeMethods
 {
     /// <summary>
     /// Initializes a whisper context from a file with the specified parameters.

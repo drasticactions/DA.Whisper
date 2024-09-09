@@ -34,13 +34,13 @@ public class FullParams
     /// <param name="strategy">The sampling strategy.</param>
     internal FullParams(SamplingStrategy strategy)
     {
-        this.@params = NativeMethods.whisper_full_default_params((int)strategy);
+        this.@params = NativeMethods.whisper_full_default_params((whisper_sampling_strategy)strategy);
     }
 
     /// <summary>
     /// Gets or sets the strategy.
     /// </summary>
-    public int Strategy
+    public whisper_sampling_strategy Strategy
     {
         get => this.@params.strategy;
         set => this.@params.strategy = value;

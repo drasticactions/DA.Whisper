@@ -18,7 +18,7 @@ public class WhisperLogger
     {
         unsafe
         {
-            delegate* unmanaged[Cdecl]<int, byte*, void*, void> onLogging = &LogUnmanaged;
+            delegate* unmanaged[Cdecl]<ggml_log_level, byte*, void*, void> onLogging = &LogUnmanaged;
             NativeMethods.whisper_log_set(onLogging, null);
         }
     }
@@ -40,7 +40,7 @@ public class WhisperLogger
     /// <param name="message">The log message.</param>
     /// <param name="user_data">User data.</param>
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
-    internal static unsafe void LogUnmanaged(int level, byte* message, void* user_data)
+    internal static unsafe void LogUnmanaged(ggml_log_level level, byte* message, void* user_data)
     {
         Instance.OnLog?.Invoke(new LogEventArgs((LogLevel)level, Marshal.PtrToStringAnsi((IntPtr)message) ?? string.Empty));
     }

@@ -64,7 +64,7 @@ public class ContextParams
     /// <summary>
     /// Gets or sets the preset value for the number of DTW aheads.
     /// </summary>
-    public int DtwAheadsPreset
+    public whisper_alignment_heads_preset DtwAheadsPreset
     {
         get => this.@params.dtw_aheads_preset;
         set => this.@params.dtw_aheads_preset = value;
