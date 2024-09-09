@@ -1,16 +1,73 @@
 ﻿@inject IJSRuntime JsRuntime
 @using DA.Whisper;
+@using Microsoft.AspNetCore.Components.Forms
 
 @page "/"
 
 <h1>DA.WhisperWasm Debug</h1>
 
-<button class="btn btn-primary" @onclick="OnButtonClick">Show Whipser System Info</button>
+<div>
+    <button class="btn btn-primary" @onclick="OnButtonClick">Show Whipser System Info</button>
+</div>
+
+<div>
+    <p>Select Model: </p>
+    <InputFile OnChange="OnHandleModelSelection" />
+</div>
+
+<div>
+    <p>Select Audio: </p>
+    <InputFile OnChange="OnHandleAudioSelection" />
+</div>
+
+<div>
+    <button class="btn btn-primary" @onclick="OnWhisperClick" disabled="@(!canExecute)">Create Transcript</button>
+</div>
 
 @code
 {
+    private IBrowserFile? _selectedModel;
+    private IBrowserFile? _selectedAudio;
+
+    private bool isRunning = false;
+    private bool canExecute => !isRunning && (_selectedModel is not null && _selectedAudio is not null);
+
     private async void OnButtonClick(MouseEventArgs e)
     {
        await JsRuntime.InvokeVoidAsync("alert", $"{DA.Whisper.Whisper.GetSystemInfo()}");
+    }
+
+    private async void OnWhisperClick(MouseEventArgs e)
+    {
+        isRunning = true;
+        try
+        {
+        }
+        catch
+        {
+
+        }
+        finally
+        {
+            isRunning = false;
+        }
+    }
+
+    private void OnHandleModelSelection(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles().FirstOrDefault();
+        if (file != null)
+        {
+            _selectedModel = file;
+        }
+    }
+
+    private void OnHandleAudioSelection(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles().FirstOrDefault();
+        if (file != null)
+        {
+            _selectedAudio = file;
+        }
     }
 }
