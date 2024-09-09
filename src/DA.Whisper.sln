@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DA.Whisper.VLC", "DA.Whispe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xabe.FFmpeg", "..\external\Xabe.FFmpeg\src\Xabe.FFmpeg\Xabe.FFmpeg.csproj", "{5B871E82-D072-4CAD-AEA8-78E0837336C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DA.WhisperBlazor", "DA.WhisperBlazor\DA.WhisperBlazor.csproj", "{07BAB61F-ECD8-440E-B887-1E7D3F434302}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{5B871E82-D072-4CAD-AEA8-78E0837336C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B871E82-D072-4CAD-AEA8-78E0837336C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B871E82-D072-4CAD-AEA8-78E0837336C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07BAB61F-ECD8-440E-B887-1E7D3F434302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07BAB61F-ECD8-440E-B887-1E7D3F434302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07BAB61F-ECD8-440E-B887-1E7D3F434302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07BAB61F-ECD8-440E-B887-1E7D3F434302}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
