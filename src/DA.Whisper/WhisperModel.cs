@@ -2,6 +2,8 @@
 // Copyright (c) Drastic Actions. All rights reserved.
 // </copyright>
 
+using System.Runtime.InteropServices;
+
 namespace DA.Whisper;
 
 /// <summary>
@@ -20,6 +22,7 @@ public sealed class WhisperModel : IDisposable
 #pragma warning restore SA1401 // Fields should be private
 
     private bool isDisposed = false;
+    private GCHandle? pinnedBuffer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WhisperModel"/> class with the specified model path and context parameters.
@@ -40,12 +43,14 @@ public sealed class WhisperModel : IDisposable
     /// </summary>
     /// <param name="model">The Whisper Model Stream.</param>
     /// <param name="contextParams">The context parameters for the Whisper model.</param>
-    private WhisperModel(Stream model, ContextParams contextParams)
+    private WhisperModel(byte[] model, ContextParams contextParams)
     {
         unsafe
         {
             this.ContextParams = contextParams;
-            this.Context = NativeMethods.InitFromStreamWithParams(model, contextParams);
+            this.pinnedBuffer = GCHandle.Alloc(model, GCHandleType.Pinned);
+            var bufferLength = new UIntPtr((uint)model.Length);
+            this.Context = NativeMethods.InitFromBufferWithParams((void*)this.pinnedBuffer!.Value.AddrOfPinnedObject(), bufferLength, contextParams);
         }
     }
 
@@ -91,7 +96,7 @@ public sealed class WhisperModel : IDisposable
     /// </summary>
     /// <param name="model">The Whisper model file.</param>
     /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
-    public static WhisperModel FromStream(Stream model)
+    public static WhisperModel FromBuffer(byte[] model)
     {
         return new WhisperModel(model, ContextParams.FromDefault());
     }
@@ -118,7 +123,7 @@ public sealed class WhisperModel : IDisposable
     /// </summary>
     /// <param name="model">The Whisper model file.</param>
     /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
-    public static WhisperModel? TryFromStream(Stream model)
+    public static WhisperModel? TryFromBuffer(byte[] model)
     {
         try
         {
@@ -147,7 +152,7 @@ public sealed class WhisperModel : IDisposable
     /// <param name="model">The Whisper model file.</param>
     /// <param name="contextParams">The context parameters for the Whisper model.</param>
     /// <returns>A new instance of the <see cref="WhisperModel"/> class.</returns>
-    public static WhisperModel FromStreamWithParameters(Stream model, ContextParams contextParams)
+    public static WhisperModel FromBufferWithParameters(byte[] model, ContextParams contextParams)
     {
         return new WhisperModel(model, contextParams);
     }
@@ -180,7 +185,7 @@ public sealed class WhisperModel : IDisposable
     /// <param name="contextParams">The context parameters for the Whisper model.</param>
     /// <param name="model">The WhisperModel.</param>
     /// <returns>Bool if model was initalized.</returns>
-    public static bool TryFromStreamWithParameters(Stream modelStream, ContextParams contextParams, out WhisperModel? model)
+    public static bool TryFromBufferWithParameters(byte[] modelStream, ContextParams contextParams, out WhisperModel? model)
     {
         try
         {
@@ -218,6 +223,7 @@ public sealed class WhisperModel : IDisposable
             unsafe
             {
                 NativeMethods.whisper_free(this.Context);
+                this.pinnedBuffer?.Free();
             }
 
             // Free any unmanaged objects here

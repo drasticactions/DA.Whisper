@@ -31,14 +31,11 @@ public static unsafe partial class NativeMethods
         }
     }
 
-    internal static unsafe whisper_context* InitFromStreamWithParams(Stream model, ContextParams contextParams)
+    internal static unsafe whisper_context* InitFromBufferWithParams(void* bufferArray, nuint bufferLength, ContextParams contextParams)
     {
         unsafe
         {
-            byte* modelData = (byte*)Marshal.AllocHGlobal((int)model.Length).ToPointer();
-            var result = model.Read(new Span<byte>(modelData, (int)model.Length));
-            var context = NativeMethods.whisper_init_from_buffer_with_params_no_state(modelData, (nuint)result, contextParams.Params);
-            Marshal.FreeHGlobal((IntPtr)modelData);
+            var context = NativeMethods.whisper_init_from_buffer_with_params_no_state((void*)bufferArray, (nuint)bufferLength, contextParams.Params);
             return context;
         }
     }

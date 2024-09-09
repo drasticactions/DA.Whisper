@@ -45,7 +45,7 @@
             using var modelMemoryStream = new MemoryStream();
             var modelFile = _selectedModel!.OpenReadStream(Int32.MaxValue);
             await modelFile.CopyToAsync(modelMemoryStream);
-            var model = WhisperModel.TryFromStream(modelMemoryStream);
+            var model = WhisperModel.TryFromBuffer(modelMemoryStream.ToArray());
             if (model is null)
             {
                 await JsRuntime.InvokeVoidAsync("alert", $"Failed to create model");
