@@ -3,12 +3,19 @@
         <WasmBuildNative Condition="'$(WasmBuildNative)' == ''">true</WasmBuildNative>
     </PropertyGroup>
     <ItemGroup Condition=" '$(UsingMicrosoftNETSdkBlazorWebAssembly)' == 'true' ">
-        <None Visible="false" Include="$(MSBuildThisFileDirectory)browser-wasm/libwhisper.a">
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)browser-wasm/whisper.a">
             <Pack>true</Pack>
             <PackageCopyToOutput>true</PackageCopyToOutput>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <TargetPath>browser-wasm/libwhisper.a</TargetPath>
+            <TargetPath>browser-wasm/whisper.a</TargetPath>
         </None>
-        <NativeFileReference Include="$(MSBuildThisFileDirectory)browser-wasm/libwhisper.a" />
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)browser-wasm/ggml.a">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>browser-wasm/ggml.a</TargetPath>
+        </None>
+        <NativeFileReference Include="$(MSBuildThisFileDirectory)browser-wasm/whisper.a" />
+        <NativeFileReference Include="$(MSBuildThisFileDirectory)browser-wasm/ggml.a" />
     </ItemGroup>
 </Project>

@@ -28,10 +28,11 @@ macos_runtime_verify:
 
 wasm: wasm_verify
 	rm -rf build/wasm
-	emcmake cmake -S $(PROJECT_ROOT) -B build/wasm $(CMAKE_PARAMETERS)
+	emcmake cmake -S $(PROJECT_ROOT) -B build/wasm $(CMAKE_PARAMETERS) -DBUILD_SHARED_LIBS=ON
 	cmake --build build/wasm --config $(BUILD_TYPE)
 	mkdir -p runtime/browser-wasm
-	cp build/wasm/src/libwhisper.a runtime/browser-wasm/libwhisper.a
+	cp build/wasm/src/libwhisper.a runtime/browser-wasm/whisper.a
+	cp build/wasm/ggml/src/libggml.a runtime/browser-wasm/ggml.a
 
 apple: apple_verify macos ios_simulator_x64 ios_simulator_arm64 lipo_ios_simulator ios maccatalyst_x64 maccatalyst_arm64 lipo_maccatalyst
 
