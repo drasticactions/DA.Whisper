@@ -6,6 +6,7 @@ fishyflip.runsettings
 external/Drastic.FlipperKit/build/
 src/Frameworks
 nuget/
+model/
 .meteor/
 .DS_Store
 .vscode/

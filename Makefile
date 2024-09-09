@@ -102,5 +102,16 @@ lipo_maccatalyst:
 	cp $(ROOT)/build/maccatalyst-x64/bin/ggml-common.h runtime/maccatalyst/ggml-common.h
 
 macos_debug: macos_runtime_verify
-	dotnet build $(ROOT)/src/DA.WhisperCli
+	dotnet run --project $(ROOT)/src/DA.WhisperCli -- transcribe $(ROOT)/external/whisper.cpp/samples/jfk.wav -m $(ROOT)/model/ggml-tiny.bin -f srt,json -o $(ROOT)/output
+
+download_tiny_model:
+	mkdir -p model
+	@echo "Checking if ggml-tiny exists..."
+	@if [ -f model/ggml-tiny.bin ]; then \
+		echo "ggml-tiny exists."; \
+		exit 0; \
+	fi
+	@echo "Downloading tiny model"
+	@curl -L https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin?download=true -o model/ggml-tiny.bin
+	@echo "Downloaded ggml-tiny.bin"
 

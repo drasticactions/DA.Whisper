@@ -186,7 +186,7 @@ public class WhisperCommands
     {
         var consoleLog = new ConsoleLog(verbose);
         var modelService = new WhisperModelService();
-        consoleLog.LogDebug($"Cache Location: {WhisperStatic.DefaultPath}");
+        consoleLog.Log($"Cache Location: {WhisperStatic.DefaultPath}");
         foreach (var model in modelService.AllModels)
         {
             consoleLog.Log($"[{model.GgmlType} {model.QuantizationType}]");
@@ -200,7 +200,7 @@ public class WhisperCommands
     {
         var consoleLog = new ConsoleLog(verbose);
         var modelService = new WhisperModelService();
-        consoleLog.LogDebug($"Cache Location: {WhisperStatic.DefaultPath}");
+        consoleLog.Log($"Cache Location: {WhisperStatic.DefaultPath}");
         foreach (var model in modelService.AvailableModels)
         {
             consoleLog.Log($"[{model.GgmlType} {model.QuantizationType}]");
