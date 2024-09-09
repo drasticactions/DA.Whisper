@@ -7,7 +7,12 @@
 <h1>DA.WhisperWasm Debug</h1>
 
 <div>
-    <button class="btn btn-primary" @onclick="OnButtonClick">Show Whipser System Info</button>
+    <button class="btn btn-primary" @onclick="OnButtonClick">Button with unmarshaled bit struct</button>
+</div>
+
+
+<div>
+    <button class="btn btn-primary" @onclick="OnButton2Click">Button with marshaled bit -> bool struct</button>
 </div>
 
 <div>
@@ -34,8 +39,14 @@
 
     private async void OnButtonClick(MouseEventArgs e)
     {
-        var test = NativeMethods.whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY);
-       await JsRuntime.InvokeVoidAsync("alert", $"{DA.Whisper.Whisper.GetSystemInfo()}");
+       var test = NativeMethods.whisper_context_default_params1();
+       await JsRuntime.InvokeVoidAsync("alert", $"Should work!");
+    }
+
+    private async void OnButton2Click(MouseEventArgs e)
+    {
+        var test = NativeMethods.whisper_context_default_params();
+        await JsRuntime.InvokeVoidAsync("alert", $"Should fail!");
     }
 
     private async void OnWhisperClick(MouseEventArgs e)

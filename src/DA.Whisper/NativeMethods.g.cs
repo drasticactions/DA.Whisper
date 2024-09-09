@@ -234,6 +234,9 @@ namespace DA.Whisper
         [DllImport(__DllName, EntryPoint = "whisper_context_default_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern whisper_context_params whisper_context_default_params();
 
+        [DllImport(__DllName, EntryPoint = "whisper_context_default_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_context1 whisper_context_default_params1();
+
         [DllImport(__DllName, EntryPoint = "whisper_full_default_params_by_ref", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern whisper_full_params* whisper_full_default_params_by_ref(whisper_sampling_strategy strategy);
 
@@ -359,6 +362,19 @@ namespace DA.Whisper
     {
         public nuint n_heads;
         public whisper_ahead* heads;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe partial struct whisper_context1
+    {
+        public byte use_gpu;
+        public byte flash_attn;
+        public int gpu_device;
+        public byte dtw_token_timestamps;
+        public whisper_alignment_heads_preset dtw_aheads_preset;
+        public int dtw_n_top;
+        public whisper_aheads dtw_aheads;
+        public nuint dtw_mem_size;
     }
 
     [StructLayout(LayoutKind.Sequential)]
