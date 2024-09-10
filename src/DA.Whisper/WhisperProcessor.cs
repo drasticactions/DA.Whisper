@@ -297,12 +297,12 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
                     this.processingSemaphore.Wait();
                     this.segmentIndex = 0;
 
-                    var state = NativeMethods.whisper_init_state(this.model.Context);
+                    var state = NativeMethods.whisper_init_state((whisper_context*)this.model.Context.Handle);
 
                     try
                     {
                         var paramTest = this.fullParams.Params;
-                        NativeMethods.whisper_full_with_state(this.model.Context, state, this.fullParams.Params, pData, samples.Length);
+                        NativeMethods.whisper_full_with_state((whisper_context*)this.model.Context.Handle, state, this.fullParams.Params, pData, samples.Length);
                     }
                     finally
                     {

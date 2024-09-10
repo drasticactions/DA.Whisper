@@ -18,7 +18,7 @@ public sealed class WhisperModel : IDisposable
     /// Gets the context.
     /// </summary>
 #pragma warning disable SA1401 // Fields should be private
-    internal unsafe whisper_context* Context;
+    internal UnmanagedResource<nint> Context = new();
 #pragma warning restore SA1401 // Fields should be private
 
     private bool isDisposed = false;
@@ -34,7 +34,7 @@ public sealed class WhisperModel : IDisposable
         unsafe
         {
             this.ContextParams = contextParams;
-            this.Context = NativeMethods.InitFromFileWithParams(modelPath, contextParams);
+            this.Context.Create(() => (nint)NativeMethods.InitFromFileWithParams(modelPath, contextParams), (x) => NativeMethods.whisper_free((whisper_context*)x));
         }
     }
 
@@ -50,7 +50,7 @@ public sealed class WhisperModel : IDisposable
             this.ContextParams = contextParams;
             this.pinnedBuffer = GCHandle.Alloc(model, GCHandleType.Pinned);
             var bufferLength = new UIntPtr((uint)model.Length);
-            this.Context = NativeMethods.InitFromBufferWithParams((void*)this.pinnedBuffer!.Value.AddrOfPinnedObject(), bufferLength, contextParams);
+            this.Context.Create(() => (nint)NativeMethods.InitFromBufferWithParams((void*)this.pinnedBuffer!.Value.AddrOfPinnedObject(), bufferLength, contextParams), (x) => NativeMethods.whisper_free((whisper_context*)x));
         }
     }
 
@@ -64,7 +64,7 @@ public sealed class WhisperModel : IDisposable
         {
             this.pinnedBuffer = GCHandle.Alloc(model, GCHandleType.Pinned);
             var bufferLength = new UIntPtr((uint)model.Length);
-            this.Context = NativeMethods.InitFromBuffer((void*)this.pinnedBuffer!.Value.AddrOfPinnedObject(), bufferLength);
+            this.Context.Create(() => (nint)NativeMethods.InitFromBuffer((void*)this.pinnedBuffer!.Value.AddrOfPinnedObject(), bufferLength), (x) => NativeMethods.whisper_free((whisper_context*)x));
         }
     }
 
@@ -85,7 +85,7 @@ public sealed class WhisperModel : IDisposable
         {
             unsafe
             {
-                return this.Context is not null && ((IntPtr)this.Context) != IntPtr.Zero;
+                return this.Context.Handle != IntPtr.Zero;
             }
         }
     }
@@ -236,7 +236,7 @@ public sealed class WhisperModel : IDisposable
 
             unsafe
             {
-                NativeMethods.whisper_free(this.Context);
+                this.Context.Dispose();
                 this.pinnedBuffer?.Free();
             }
 
