@@ -33,7 +33,7 @@ public class ContextParams
     public bool UseGpu
     {
         get => this.@params.use_gpu != FalseByte;
-        set => this.@params.use_gpu = (value ? TrueByte : FalseByte);
+        set => this.@params.use_gpu = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class ContextParams
     public bool FlashAttn
     {
         get => this.@params.flash_attn != FalseByte;
-        set => this.@params.flash_attn = (value ? TrueByte : FalseByte);
+        set => this.@params.flash_attn = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public class ContextParams
     public bool DtwTokenTimestamps
     {
         get => this.@params.dtw_token_timestamps != FalseByte;
-        set => this.@params.dtw_token_timestamps = (value ? TrueByte : FalseByte);
+        set => this.@params.dtw_token_timestamps = value ? TrueByte : FalseByte;
     }
 
     /// <summary>

@@ -16,7 +16,7 @@ public class FullParams
 {
     private const byte TrueByte = 1;
     private const byte FalseByte = 0;
-    
+
     /// <summary>
     /// The underlying whisper_full_params object.
     /// </summary>
@@ -97,7 +97,7 @@ public class FullParams
     public bool Translate
     {
         get => this.@params.translate != FalseByte;
-        set => this.@params.translate = (value ? TrueByte : FalseByte);
+        set => this.@params.translate = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class FullParams
     public bool NoContext
     {
         get => this.@params.no_context != FalseByte;
-        set => this.@params.no_context = (value ? TrueByte : FalseByte);
+        set => this.@params.no_context = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public class FullParams
     public bool NoTimestamps
     {
         get => this.@params.no_timestamps != FalseByte;
-        set => this.@params.no_timestamps = (value ? TrueByte : FalseByte);
+        set => this.@params.no_timestamps = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class FullParams
     public bool SingleSegment
     {
         get => this.@params.single_segment != FalseByte;
-        set => this.@params.single_segment = (value ? TrueByte : FalseByte);
+        set => this.@params.single_segment = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -133,7 +133,7 @@ public class FullParams
     public bool PrintSpecial
     {
         get => this.@params.print_special != FalseByte;
-        set => this.@params.print_special = (value ? TrueByte : FalseByte);
+        set => this.@params.print_special = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public class FullParams
     public bool PrintProgress
     {
         get => this.@params.print_progress != FalseByte;
-        set => this.@params.print_progress = (value ? TrueByte : FalseByte);
+        set => this.@params.print_progress = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public class FullParams
     public bool PrintRealtime
     {
         get => this.@params.print_realtime != FalseByte;
-        set => this.@params.print_realtime = (value ? TrueByte : FalseByte);
+        set => this.@params.print_realtime = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public class FullParams
     public bool PrintTimestamps
     {
         get => this.@params.print_timestamps != FalseByte;
-        set => this.@params.print_timestamps = (value ? TrueByte : FalseByte);
+        set => this.@params.print_timestamps = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -169,7 +169,7 @@ public class FullParams
     public bool TokenTimestamps
     {
         get => this.@params.token_timestamps != FalseByte;
-        set => this.@params.token_timestamps = (value ? TrueByte : FalseByte);
+        set => this.@params.token_timestamps = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public class FullParams
     public bool DebugMode
     {
         get => this.@params.debug_mode != FalseByte;
-        set => this.@params.debug_mode = (value ? TrueByte : FalseByte);
+        set => this.@params.debug_mode = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public class FullParams
     public bool TdrzEnable
     {
         get => this.@params.tdrz_enable != FalseByte;
-        set => this.@params.tdrz_enable = (value ? TrueByte : FalseByte);
+        set => this.@params.tdrz_enable = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -320,7 +320,7 @@ public class FullParams
     public bool DetectLanguage
     {
         get => this.@params.detect_language != FalseByte;
-        set => this.@params.detect_language = (value ? TrueByte : FalseByte);
+        set => this.@params.detect_language = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -329,7 +329,7 @@ public class FullParams
     public bool SuppressBlank
     {
         get => this.@params.suppress_blank != FalseByte;
-        set => this.@params.suppress_blank = (value ? TrueByte : FalseByte);
+        set => this.@params.suppress_blank = value ? TrueByte : FalseByte;
     }
 
     /// <summary>
@@ -338,7 +338,7 @@ public class FullParams
     public bool SuppressNonSpeechTokens
     {
         get => this.@params.suppress_non_speech_tokens != FalseByte;
-        set => this.@params.suppress_non_speech_tokens = (value ? TrueByte : FalseByte);
+        set => this.@params.suppress_non_speech_tokens = value ? TrueByte : FalseByte;
     }
 
     /// <summary>

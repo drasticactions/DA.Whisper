@@ -51,10 +51,10 @@ public class FFMpegTranscodeService : ITranscodeService, IDisposable
             var outputfile = Path.Combine(this.basePath, $"{this.generatedFilename ?? Path.GetRandomFileName()}.wav");
             var arguments = FFMpegArguments
                 .FromFileInput(file)
-                .OutputToFile(outputfile, true,
-                    options => options.WithAudioCodec("pcm_s16le").WithAudioSamplingRate(16000)
-                );
-            
+                .OutputToFile(
+                outputfile,
+                true,
+                options => options.WithAudioCodec("pcm_s16le").WithAudioSamplingRate(16000));
             this.logger?.LogInformation($"Transcoding file to: {outputfile}");
 
             var result = await arguments.ProcessAsynchronously();
