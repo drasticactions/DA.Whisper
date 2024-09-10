@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\external\FFMpegCore\FFMpegCore\FFMpegCore.csproj" />
     <ProjectReference Include="..\DA.Whisper\DA.Whisper.csproj" />
     <ProjectReference Include="..\DA.Whisper.Helpers\DA.Whisper.Helpers.csproj" />
-    <ProjectReference Include="..\..\external\Xabe.FFmpeg\src\Xabe.FFmpeg\Xabe.FFmpeg.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

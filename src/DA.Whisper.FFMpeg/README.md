@@ -2,4 +2,4 @@
 
 ## Third Party Libraries
 
-- [Xabe.FFmpeg](https://github.com/tomaszzmuda/Xabe.FFmpeg)
+- [FFmpegCore](https://github.com/drasticactions/FFMpegCore)

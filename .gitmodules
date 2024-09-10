@@ -1,9 +1,9 @@
 [submodule "external/whisper.cpp"]
 	path = external/whisper.cpp
 	url = git@github.com:ggerganov/whisper.cpp.git
-[submodule "external/Xabe.FFmpeg"]
-	path = external/Xabe.FFmpeg
-	url = git@github.com:drasticactions/Xabe.FFmpeg.git
 [submodule "external/DA.UI"]
 	path = external/DA.UI
 	url = git@github.com:drasticactions/DA.UI.git
+[submodule "external/FFMpegCore"]
+	path = external/FFMpegCore
+	url = git@github.com:drasticactions/FFMpegCore.git

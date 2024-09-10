@@ -2,8 +2,9 @@
 // Copyright (c) Drastic Actions. All rights reserved.
 // </copyright>
 
+using FFMpegCore;
+using FFMpegCore.Pipes;
 using Microsoft.Extensions.Logging;
-using Xabe.FFmpeg;
 
 namespace DA.Whisper;
 
@@ -35,7 +36,7 @@ public class FFMpegTranscodeService : ITranscodeService, IDisposable
     /// <inheritdoc/>
     public async Task<(string FilePath, bool Transcoded)> ProcessFile(string file)
     {
-        var mediaInfo = await FFmpeg.GetMediaInfo(file);
+        var mediaInfo = await FFProbe.AnalyseAsync(file);
         this.logger?.LogInformation($"Processing file: {file}");
         var audioStream = mediaInfo.AudioStreams.FirstOrDefault();
         if (audioStream is null)
@@ -44,18 +45,21 @@ public class FFMpegTranscodeService : ITranscodeService, IDisposable
             throw new InvalidOperationException("No audio stream found.");
         }
 
-        var shouldTranscode = audioStream.Codec != "pcm_s16le" || audioStream.SampleRate != 16000;
+        var shouldTranscode = audioStream.CodecName != "pcm_s16le" || audioStream.SampleRateHz != 16000;
         if (shouldTranscode)
         {
             var outputfile = Path.Combine(this.basePath, $"{this.generatedFilename ?? Path.GetRandomFileName()}.wav");
-            var result = await FFmpeg.Conversions.New()
-                .AddStream(audioStream)
-                .AddParameter("-c pcm_s16le -ar 16000")
-                .SetOutput(outputfile)
-                .SetOverwriteOutput(true)
-                .Start();
+            var arguments = FFMpegArguments
+                .FromFileInput(file)
+                .OutputToFile(outputfile, true,
+                    options => options.WithAudioCodec("pcm_s16le").WithAudioSamplingRate(16000)
+                );
+            
+            this.logger?.LogInformation($"Transcoding file to: {outputfile}");
 
-            if (result is null)
+            var result = await arguments.ProcessAsynchronously();
+
+            if (!result)
             {
                 this.logger?.LogError("FFMpeg failed to transcode file.");
                 throw new InvalidOperationException("FFMpeg failed to transcode file.");
