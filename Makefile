@@ -11,6 +11,8 @@ clean:
 binding:
 	cd $(ROOT)/bindings/whisper-bindings && cargo build --release
 	cd $(ROOT)/bindings/whisper-bindings && cargo run
+	@echo "Modifying NativeMethods.g.cs to replace [MarshalAs(UnmanagedType.U1)] public bool with byte"
+	@sed -i '' 's/\[MarshalAs(UnmanagedType.U1)\] public bool/\[MarshalAs(UnmanagedType.U1)\] public byte/g' $(ROOT)/src/DA.Whisper/NativeMethods.g.cs
 
 wasm_verify:
 	@emcc -v > /dev/null 2>&1 || (echo "Emscripten is not installed. Please install Emscripten." && exit 1)

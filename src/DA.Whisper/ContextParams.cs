@@ -14,6 +14,8 @@ namespace DA.Whisper;
 /// </summary>
 public class ContextParams
 {
+    private const byte TrueByte = 1;
+    private const byte FalseByte = 0;
     private whisper_context_params @params;
 
     /// <summary>
@@ -30,8 +32,8 @@ public class ContextParams
     /// </summary>
     public bool UseGpu
     {
-        get => this.@params.use_gpu;
-        set => this.@params.use_gpu = value;
+        get => this.@params.use_gpu != FalseByte;
+        set => this.@params.use_gpu = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -39,8 +41,8 @@ public class ContextParams
     /// </summary>
     public bool FlashAttn
     {
-        get => this.@params.flash_attn;
-        set => this.@params.flash_attn = value;
+        get => this.@params.flash_attn != FalseByte;
+        set => this.@params.flash_attn = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -57,8 +59,8 @@ public class ContextParams
     /// </summary>
     public bool DtwTokenTimestamps
     {
-        get => this.@params.dtw_token_timestamps;
-        set => this.@params.dtw_token_timestamps = value;
+        get => this.@params.dtw_token_timestamps != FalseByte;
+        set => this.@params.dtw_token_timestamps = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>

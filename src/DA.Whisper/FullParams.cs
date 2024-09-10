@@ -14,6 +14,9 @@ namespace DA.Whisper;
 /// </summary>
 public class FullParams
 {
+    private const byte TrueByte = 1;
+    private const byte FalseByte = 0;
+    
     /// <summary>
     /// The underlying whisper_full_params object.
     /// </summary>
@@ -93,8 +96,8 @@ public class FullParams
     /// </summary>
     public bool Translate
     {
-        get => this.@params.translate;
-        set => this.@params.translate = value;
+        get => this.@params.translate != FalseByte;
+        set => this.@params.translate = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -102,8 +105,8 @@ public class FullParams
     /// </summary>
     public bool NoContext
     {
-        get => this.@params.no_context;
-        set => this.@params.no_context = value;
+        get => this.@params.no_context != FalseByte;
+        set => this.@params.no_context = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -111,8 +114,8 @@ public class FullParams
     /// </summary>
     public bool NoTimestamps
     {
-        get => this.@params.no_timestamps;
-        set => this.@params.no_timestamps = value;
+        get => this.@params.no_timestamps != FalseByte;
+        set => this.@params.no_timestamps = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -120,8 +123,8 @@ public class FullParams
     /// </summary>
     public bool SingleSegment
     {
-        get => this.@params.single_segment;
-        set => this.@params.single_segment = value;
+        get => this.@params.single_segment != FalseByte;
+        set => this.@params.single_segment = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -129,8 +132,8 @@ public class FullParams
     /// </summary>
     public bool PrintSpecial
     {
-        get => this.@params.print_special;
-        set => this.@params.print_special = value;
+        get => this.@params.print_special != FalseByte;
+        set => this.@params.print_special = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -138,8 +141,8 @@ public class FullParams
     /// </summary>
     public bool PrintProgress
     {
-        get => this.@params.print_progress;
-        set => this.@params.print_progress = value;
+        get => this.@params.print_progress != FalseByte;
+        set => this.@params.print_progress = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -147,8 +150,8 @@ public class FullParams
     /// </summary>
     public bool PrintRealtime
     {
-        get => this.@params.print_realtime;
-        set => this.@params.print_realtime = value;
+        get => this.@params.print_realtime != FalseByte;
+        set => this.@params.print_realtime = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -156,8 +159,8 @@ public class FullParams
     /// </summary>
     public bool PrintTimestamps
     {
-        get => this.@params.print_timestamps;
-        set => this.@params.print_timestamps = value;
+        get => this.@params.print_timestamps != FalseByte;
+        set => this.@params.print_timestamps = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -165,8 +168,8 @@ public class FullParams
     /// </summary>
     public bool TokenTimestamps
     {
-        get => this.@params.token_timestamps;
-        set => this.@params.token_timestamps = value;
+        get => this.@params.token_timestamps != FalseByte;
+        set => this.@params.token_timestamps = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -201,8 +204,12 @@ public class FullParams
     /// </summary>
     public bool SplitOnWord
     {
-        get => this.@params.split_on_word;
-        set => this.@params.split_on_word = value;
+        get => this.@params.split_on_word != FalseByte;
+        set
+        {
+            var byteValue = value ? 1 : 0;
+            this.@params.split_on_word = (byte)byteValue;
+        }
     }
 
     /// <summary>
@@ -219,8 +226,8 @@ public class FullParams
     /// </summary>
     public bool DebugMode
     {
-        get => this.@params.debug_mode;
-        set => this.@params.debug_mode = value;
+        get => this.@params.debug_mode != FalseByte;
+        set => this.@params.debug_mode = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -237,8 +244,8 @@ public class FullParams
     /// </summary>
     public bool TdrzEnable
     {
-        get => this.@params.tdrz_enable;
-        set => this.@params.tdrz_enable = value;
+        get => this.@params.tdrz_enable != FalseByte;
+        set => this.@params.tdrz_enable = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -286,7 +293,7 @@ public class FullParams
     }
 
     /// <summary>
-    /// Gets or sets the suppress regex.
+    /// Gets or sets the suppression regex.
     /// </summary>
     public string SuppressRegex
     {
@@ -312,8 +319,8 @@ public class FullParams
     /// </summary>
     public bool DetectLanguage
     {
-        get => this.@params.detect_language;
-        set => this.@params.detect_language = value;
+        get => this.@params.detect_language != FalseByte;
+        set => this.@params.detect_language = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -321,8 +328,8 @@ public class FullParams
     /// </summary>
     public bool SuppressBlank
     {
-        get => this.@params.suppress_blank;
-        set => this.@params.suppress_blank = value;
+        get => this.@params.suppress_blank != FalseByte;
+        set => this.@params.suppress_blank = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
@@ -330,8 +337,8 @@ public class FullParams
     /// </summary>
     public bool SuppressNonSpeechTokens
     {
-        get => this.@params.suppress_non_speech_tokens;
-        set => this.@params.suppress_non_speech_tokens = value;
+        get => this.@params.suppress_non_speech_tokens != FalseByte;
+        set => this.@params.suppress_non_speech_tokens = (value ? TrueByte : FalseByte);
     }
 
     /// <summary>
