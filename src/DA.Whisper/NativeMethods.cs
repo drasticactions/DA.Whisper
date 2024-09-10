@@ -31,6 +31,13 @@ public static unsafe partial class NativeMethods
         }
     }
 
+    /// <summary>
+    /// Initializes a whisper context from a buffer with the specified parameters.
+    /// </summary>
+    /// <param name="bufferArray">The buffer array.</param>
+    /// <param name="bufferLength">The length of the buffer.</param>
+    /// <param name="contextParams">The context parameters.</param>
+    /// <returns>The initialized whisper context.</returns>
     internal static unsafe whisper_context* InitFromBufferWithParams(void* bufferArray, nuint bufferLength, ContextParams contextParams)
     {
         unsafe
@@ -40,6 +47,12 @@ public static unsafe partial class NativeMethods
         }
     }
 
+    /// <summary>
+    /// Initializes a whisper context from a buffer.
+    /// </summary>
+    /// <param name="bufferArray">The buffer array.</param>
+    /// <param name="bufferLength">The length of the buffer.</param>
+    /// <returns>The initialized whisper context.</returns>
     internal static unsafe whisper_context* InitFromBuffer(void* bufferArray, nuint bufferLength)
     {
         unsafe
