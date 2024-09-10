@@ -13,7 +13,7 @@
                 <PackageCopyToOutput>true</PackageCopyToOutput>
                 <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
                 <TargetPath>libwhisper.dylib</TargetPath>
-            </None>
+        </None>
     </ItemGroup>
     <ItemGroup Condition="(('$(Platform)' == 'iPhone') OR ('$(RuntimeIdentifier)' == 'ios') OR $(RuntimeIdentifier.StartsWith('ios-')) OR $(RuntimeIdentifier.StartsWith('ios.')))">
         <None Visible="false" Include="$(MSBuildThisFileDirectory)ios\libwhisper.dylib">
@@ -21,7 +21,7 @@
                 <PackageCopyToOutput>true</PackageCopyToOutput>
                 <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
                 <TargetPath>libwhisper.dylib</TargetPath>
-            </None>
+        </None>
     </ItemGroup>
     <ItemGroup Condition="$(TargetFramework.Contains('-maccatalyst')) == true ">
         <None Visible="false" Include="$(MSBuildThisFileDirectory)maccatalyst\libwhisper.dylib">
