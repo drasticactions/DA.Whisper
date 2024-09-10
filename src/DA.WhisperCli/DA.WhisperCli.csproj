@@ -19,6 +19,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAOT>true</PublishAOT>
+    <NoWarn>$(NoWarn);IL2026;IL3050</NoWarn>
   </PropertyGroup>
 
 </Project>
