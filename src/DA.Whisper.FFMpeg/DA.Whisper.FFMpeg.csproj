@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\external\FFMpegCore\FFMpegCore\FFMpegCore.csproj" />
     <ProjectReference Include="..\DA.Whisper\DA.Whisper.csproj" />
     <ProjectReference Include="..\DA.Whisper.Helpers\DA.Whisper.Helpers.csproj" />
   </ItemGroup>
@@ -15,5 +14,6 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="FFMpegCore.NativeAOT" />
 	</ItemGroup>
 </Project>

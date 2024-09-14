@@ -4,6 +4,3 @@
 [submodule "external/DA.UI"]
 	path = external/DA.UI
 	url = git@github.com:drasticactions/DA.UI.git
-[submodule "external/FFMpegCore"]
-	path = external/FFMpegCore
-	url = git@github.com:drasticactions/FFMpegCore.git
