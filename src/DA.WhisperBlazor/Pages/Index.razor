@@ -56,7 +56,7 @@
             var audioFile = _selectedAudio!.OpenReadStream(Int32.MaxValue);
             using var memoryStream = new MemoryStream();
             await audioFile.CopyToAsync(memoryStream);
-
+            memoryStream.Seek(0, SeekOrigin.Begin);
             var processor = WhisperProcessor.CreateWithDefaultGreedyStrategy(model);
             var result = processor.ProcessAsync(memoryStream);
             await foreach (var item in result)
