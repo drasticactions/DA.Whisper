@@ -6,6 +6,7 @@ using System.Text.Json;
 using ConsoleAppFramework;
 using DA.Whisper;
 using DA.WhisperCli;
+using Downloader;
 using Microsoft.Extensions.Logging;
 using OpenTK.Audio.OpenAL;
 
@@ -194,6 +195,68 @@ public class WhisperCommands
     }
 
     /// <summary>
+    /// Download a whisper model from the whisper.cpp Hugging Face model hub.
+    /// </summary>
+    /// <param name="modelType">Model Type.</param>
+    /// <param name="quantizationType">-q, Quantization Type.</param>
+    /// <param name="outputPath">-o, Model Output Path.</param>
+    /// <param name="force">-f, Force download.</param>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
+    /// <returns>Task.</returns>
+    [Command("download-model")]
+    public async Task DownloadModelAsync([Argument]GgmlType modelType, QuantizationType quantizationType = QuantizationType.NoQuantization, string? outputPath = default, bool force = false, bool verbose = false, CancellationToken cancellationToken = default)
+    {
+        var consoleLog = new ConsoleLog(verbose);
+        consoleLog.Log($"Downloading model: {modelType} - {quantizationType}");
+        var modelUrl = WhisperStatic.ToDownloadUrl(modelType, quantizationType);
+        consoleLog.Log($"Model URL: {modelUrl}");
+        var downloader = new DownloadService(new DownloadConfiguration()
+        {
+            ChunkCount = 8,
+            ParallelDownload = true,
+        });
+        downloader.DownloadFileCompleted += (sender, e) =>
+        {
+            Console.WriteLine();
+            if (e.Cancelled && e.UserState is Downloader.DownloadPackage package)
+            {
+                consoleLog.Log($"Download cancelled");
+            }
+            else
+            {
+                consoleLog.Log($"Download completed");
+            }
+        };
+        downloader.DownloadProgressChanged += (sender, e) =>
+        {
+              Console.Write($"\r{e.ProgressPercentage.ToString("0.00").PadLeft(6)}%");
+        };
+
+        var modelName = quantizationType == QuantizationType.NoQuantization ? modelType.ToString() : $"{modelType.ToString()}_{quantizationType}";
+
+        var outputFilePath = !string.IsNullOrEmpty(outputPath) ? Path.Combine(outputPath, $"{modelName}.ggml".ToLowerInvariant()) : Path.Combine(Environment.CurrentDirectory, $"{modelName}.ggml".ToLowerInvariant());
+        consoleLog.LogDebug($"Output Path: {outputFilePath}");
+
+        if (File.Exists(outputFilePath))
+        {
+            if (force)
+            {
+                consoleLog.Log("Deleting existing file.");
+                File.Delete(outputFilePath);
+            }
+            else
+            {
+                consoleLog.Log("File already exists. Use -f to force download.");
+                return;
+            }
+        }
+
+        await downloader.DownloadFileTaskAsync(modelUrl, outputFilePath, cancellationToken);
+    }
+
+#if DEBUG
+    /// <summary>
     /// Transcribe live audio to text.
     /// </summary>
     /// <param name="verbose">-v, Verbose logging.</param>
@@ -203,11 +266,6 @@ public class WhisperCommands
     public async Task RealtimeAsync(bool verbose = false, CancellationToken cancellationToken = default)
     {
         var consoleLog = new ConsoleLog(verbose);
-
-#if RELEASE
-        consoleLog.LogError("Realtime transcription is not implemented.");
-        return;
-#endif
 
         consoleLog.LogDebug("Default Mic:\n" + ALC.GetString(ALDevice.Null, AlcGetString.CaptureDefaultDeviceSpecifier));
         consoleLog.LogDebug("Mic List:\n" + string.Join("\n", ALC.GetString(ALDevice.Null, AlcGetStringList.CaptureDeviceSpecifier)));
@@ -220,6 +278,7 @@ public class WhisperCommands
         null,
         cancellationToken: cancellationToken);
     }
+#endif
 
     /// <summary>Generates the context parameters file.</summary>
     /// <param name="outputName">Output file name.</param>
