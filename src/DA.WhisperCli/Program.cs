@@ -236,7 +236,7 @@ public class WhisperCommands
 
         var modelName = modelType.ToFilename(quantizationType);
 
-        var outputFilePath = !string.IsNullOrEmpty(outputPath) ? Path.Combine(outputPath, $"{modelName}.bin".ToLowerInvariant()) : Path.Combine(Environment.CurrentDirectory, $"{modelName}.ggml".ToLowerInvariant());
+        var outputFilePath = !string.IsNullOrEmpty(outputPath) ? Path.Combine(outputPath, $"{modelName}".ToLowerInvariant()) : Path.Combine(Environment.CurrentDirectory, $"{modelName}".ToLowerInvariant());
         consoleLog.LogDebug($"Output Path: {outputFilePath}");
 
         if (File.Exists(outputFilePath))

@@ -121,6 +121,10 @@ macos_release_arm64_artifact: macos_runtime_verify
 	mkdir -p artifacts/macos/arm64
 	dotnet publish $(WHISPERCLI) -c Release -o artifacts/macos/arm64 -r osx-arm64
 
+macos_release_arm64_model: macos_runtime_verify
+	mkdir -p model
+	dotnet publish $(WHISPERCLI) -c Release -o model -r osx-arm64
+
 download_tiny_model:
 	mkdir -p model
 	@echo "Checking if ggml-tiny exists..."
