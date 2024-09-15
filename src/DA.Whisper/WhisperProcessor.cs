@@ -35,18 +35,14 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
 
     private Action<SegmentData>? onSegmentEventHandler;
 
-    private bool calculateProbability;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="WhisperProcessor"/> class.
     /// </summary>
     /// <param name="model">The Whisper model.</param>
     /// <param name="fullParams">The full parameters.</param>
-    /// <param name="calculateProbability">Flag indicating whether to calculate probability.</param>
     /// <param name="progress">The progress reporter.</param>
-    internal WhisperProcessor(WhisperModel model, FullParams fullParams, bool calculateProbability = false, IProgress<int>? progress = default)
+    internal WhisperProcessor(WhisperModel model, FullParams fullParams, IProgress<int>? progress = default)
     {
-        this.calculateProbability = calculateProbability;
         this.progress = progress;
         this.fullParams = fullParams;
         this.myId = Interlocked.Increment(ref currentProcessorId);
@@ -372,28 +368,25 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
                 speakerTurn = NativeMethods.whisper_full_get_segment_speaker_turn_next_from_state(state, this.segmentIndex);
             }
 
-            if (this.calculateProbability)
+            for (var tokenIndex = 0; tokenIndex < numberOfTokens; tokenIndex++)
             {
-                for (var tokenIndex = 0; tokenIndex < numberOfTokens; tokenIndex++)
+                var tokenProbability = NativeMethods.whisper_full_get_token_p_from_state(state, this.segmentIndex, tokenIndex);
+                sumProbability += tokenProbability;
+                if (tokenIndex == 0)
                 {
-                    var tokenProbability = NativeMethods.whisper_full_get_token_p_from_state(state, this.segmentIndex, tokenIndex);
-                    sumProbability += tokenProbability;
-                    if (tokenIndex == 0)
-                    {
-                        minimumProbability = tokenProbability;
-                        maximumProbability = tokenProbability;
-                        continue;
-                    }
+                    minimumProbability = tokenProbability;
+                    maximumProbability = tokenProbability;
+                    continue;
+                }
 
-                    if (tokenProbability < minimumProbability)
-                    {
-                        minimumProbability = tokenProbability;
-                    }
+                if (tokenProbability < minimumProbability)
+                {
+                    minimumProbability = tokenProbability;
+                }
 
-                    if (tokenProbability > maximumProbability)
-                    {
-                        maximumProbability = tokenProbability;
-                    }
+                if (tokenProbability > maximumProbability)
+                {
+                    maximumProbability = tokenProbability;
                 }
             }
 
