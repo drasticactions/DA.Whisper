@@ -14,4 +14,5 @@ namespace DA.Whisper;
 /// <param name="MaxProbability">The maximum probability of the segment.</param>
 /// <param name="Probability">The probability of the segment.</param>
 /// <param name="Language">The language of the segment.</param>
-public record SegmentData(string Text, TimeSpan Start, TimeSpan End, float MinProbability, float MaxProbability, float Probability, string Language);
+/// <param name="SpeakerTurn">Is this a speaker turn.</param>
+public record SegmentData(string Text, TimeSpan Start, TimeSpan End, float MinProbability, float MaxProbability, float Probability, string Language, bool SpeakerTurn);

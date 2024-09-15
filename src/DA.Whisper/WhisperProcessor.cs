@@ -361,9 +361,16 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
             float minimumProbability = 0;
             float maximumProbability = 0;
             double sumProbability = 0;
+
             var numberOfTokens = NativeMethods.whisper_full_n_tokens_from_state(state, this.segmentIndex);
             var languageId = NativeMethods.whisper_full_lang_id_from_state(state);
             var language = Marshal.PtrToStringAnsi((IntPtr)NativeMethods.whisper_lang_str(languageId));
+            bool speakerTurn = false;
+
+            if (this.fullParams.TdrzEnable)
+            {
+                speakerTurn = NativeMethods.whisper_full_get_segment_speaker_turn_next_from_state(state, this.segmentIndex);
+            }
 
             if (this.calculateProbability)
             {
@@ -392,7 +399,7 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
 
             if (!string.IsNullOrEmpty(textAnsi))
             {
-                var eventHandlerArgs = new SegmentData(textAnsi.Trim(), t0, t1, minimumProbability, maximumProbability, (float)(sumProbability / numberOfTokens), language!);
+                var eventHandlerArgs = new SegmentData(textAnsi.Trim(), t0, t1, minimumProbability, maximumProbability, (float)(sumProbability / numberOfTokens), language!, speakerTurn);
 
                 this.onSegmentEventHandler?.Invoke(eventHandlerArgs);
                 if (this.cancellationToken?.IsCancellationRequested ?? false)
