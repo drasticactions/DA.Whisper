@@ -2,6 +2,7 @@ ROOT=$(PWD)
 PROJECT_ROOT=$(ROOT)/external/whisper.cpp
 BUILD_TYPE=Release
 CMAKE_PARAMETERS=-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+WHISPERCLI=$(ROOT)/src/DA.WhisperCli/DA.WhisperCli.csproj
 
 clean:
 	rm -rf build
@@ -104,8 +105,21 @@ lipo_maccatalyst:
 	cp $(ROOT)/build/maccatalyst-x64/bin/ggml-metal.metal runtime/maccatalyst/ggml-metal.metal
 	cp $(ROOT)/build/maccatalyst-x64/bin/ggml-common.h runtime/maccatalyst/ggml-common.h
 
-macos_debug: macos_runtime_verify
-	dotnet run --project $(ROOT)/src/DA.WhisperCli -- transcribe $(ROOT)/external/whisper.cpp/samples/jfk.wav -m $(ROOT)/model/ggml-tiny.bin -f srt,json -o $(ROOT)/output
+macos_debug_x64_artifact: macos_runtime_verify
+	mkdir -p artifacts/macos/x64
+	dotnet publish $(WHISPERCLI) -c Debug -o artifacts/macos/x64 -r osx-x64
+
+macos_release_x64_artifact: macos_runtime_verify
+	mkdir -p artifacts/macos/x64
+	dotnet publish $(WHISPERCLI) -c Release -o artifacts/macos/x64 -r osx-x64
+
+macos_debug_arm64_artifact: macos_runtime_verify
+	mkdir -p artifacts/macos/arm64
+	dotnet publish $(WHISPERCLI) -c Debug -o artifacts/macos/arm64 -r osx-arm64
+
+macos_release_arm64_artifact: macos_runtime_verify
+	mkdir -p artifacts/macos/arm64
+	dotnet publish $(WHISPERCLI) -c Release -o artifacts/macos/arm64 -r osx-arm64
 
 download_tiny_model:
 	mkdir -p model

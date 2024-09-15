@@ -234,9 +234,9 @@ public class WhisperCommands
               Console.Write($"\r{e.ProgressPercentage.ToString("0.00").PadLeft(6)}%");
         };
 
-        var modelName = quantizationType == QuantizationType.NoQuantization ? modelType.ToString() : $"{modelType.ToString()}_{quantizationType}";
+        var modelName = modelType.ToFilename(quantizationType);
 
-        var outputFilePath = !string.IsNullOrEmpty(outputPath) ? Path.Combine(outputPath, $"{modelName}.ggml".ToLowerInvariant()) : Path.Combine(Environment.CurrentDirectory, $"{modelName}.ggml".ToLowerInvariant());
+        var outputFilePath = !string.IsNullOrEmpty(outputPath) ? Path.Combine(outputPath, $"{modelName}.bin".ToLowerInvariant()) : Path.Combine(Environment.CurrentDirectory, $"{modelName}.ggml".ToLowerInvariant());
         consoleLog.LogDebug($"Output Path: {outputFilePath}");
 
         if (File.Exists(outputFilePath))
