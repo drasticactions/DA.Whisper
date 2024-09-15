@@ -1,4 +1,4 @@
-// <copyright file="SrtSubtitleLine.cs" company="Drastic Actions">
+// <copyright file="SubtitleLine.cs" company="Drastic Actions">
 // Copyright (c) Drastic Actions. All rights reserved.
 // </copyright>
 
@@ -11,21 +11,25 @@ namespace DA.Whisper;
 /// <summary>
 /// Represents a subtitle line in SRT format.
 /// </summary>
-public class SrtSubtitleLine
+public class SubtitleLine
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="SrtSubtitleLine"/> class.
+    /// Initializes a new instance of the <see cref="SubtitleLine"/> class.
     /// </summary>
-    public SrtSubtitleLine()
+    /// <param name="subtitleType">The subtitle type.</param>
+    public SubtitleLine(SubtitleType subtitleType = SubtitleType.SRT)
     {
+        this.SubtitleType = subtitleType;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SrtSubtitleLine"/> class with the specified subtitle text.
+    /// Initializes a new instance of the <see cref="SubtitleLine"/> class with the specified subtitle text.
     /// </summary>
     /// <param name="subtitleText">The subtitle text.</param>
-    public SrtSubtitleLine(string subtitleText)
+    /// <param name="subtitleType">The subtitle type.</param>
+    public SubtitleLine(string subtitleText, SubtitleType subtitleType = SubtitleType.SRT)
     {
+        this.SubtitleType = subtitleType;
         subtitleText = subtitleText.Trim();
         using (StringReader data = new StringReader(subtitleText))
         {
@@ -38,6 +42,11 @@ public class SrtSubtitleLine
             this.Text = data.ReadToEnd().Trim();
         }
     }
+
+    /// <summary>
+    /// Gets or sets the subtitle type.
+    /// </summary>
+    public SubtitleType SubtitleType { get; set; }
 
     /// <summary>
     /// Gets or sets the start time.
@@ -73,7 +82,10 @@ public class SrtSubtitleLine
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine(this.LineNumber.ToString());
+        if (this.SubtitleType == SubtitleType.SRT)
+        {
+            sb.AppendLine(this.LineNumber.ToString());
+        }
 
         sb.Append(this.Start.ToString(@"hh\:mm\:ss\,fff"));
         sb.Append(" --> ");

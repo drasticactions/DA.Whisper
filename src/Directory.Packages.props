@@ -15,5 +15,6 @@
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0-rc.1.24452.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0-rc.1.24452.1" />
     <PackageVersion Include="FFMpegCore.NativeAOT" Version="6.0.0-preview" />
+    <PackageVersion Include="GitVersion.MSBuild" Version="6.0.2" />
   </ItemGroup>
 </Project>

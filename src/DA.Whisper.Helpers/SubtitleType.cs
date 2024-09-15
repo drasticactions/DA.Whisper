@@ -1,19 +1,16 @@
-// <copyright file="OutputFormat.cs" company="Drastic Actions">
+// <copyright file="SubtitleType.cs" company="Drastic Actions">
 // Copyright (c) Drastic Actions. All rights reserved.
 // </copyright>
 
-namespace DA.WhisperCli;
+using System.Text;
+
+namespace DA.Whisper;
 
 /// <summary>
-/// Output Format.
+/// Subtitle Type.
 /// </summary>
-public enum OutputFormat
+public enum SubtitleType
 {
-    /// <summary>
-    /// JSON.
-    /// </summary>
-    Json,
-
     /// <summary>
     /// SRT.
     /// </summary>

@@ -121,6 +121,7 @@ public class WhisperCommands
         var enumOutputFormats = outputFormats?.Select(o => Enum.Parse<OutputFormat>(o, true)).ToArray();
         var srt = enumOutputFormats?.Contains(OutputFormat.SRT) ?? false;
         var json = enumOutputFormats?.Contains(OutputFormat.Json) ?? false;
+        var vtt = enumOutputFormats?.Contains(OutputFormat.VTT) ?? false;
 
         await foreach (var segment in result)
         {
@@ -153,11 +154,11 @@ public class WhisperCommands
 
         if (srt && segments != null)
         {
-            var srtSubtitle = SrtSubtitle.FromSegments(segments);
+            var subtitle = Subtitle.FromSegments(segments);
 
             var outputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFileName) + ".srt");
             consoleLog.Log($"Writing SRT file: {outputFile}");
-            File.WriteAllText(outputFile, srtSubtitle.ToString());
+            File.WriteAllText(outputFile, subtitle.ToString());
         }
         else
         {
@@ -173,6 +174,18 @@ public class WhisperCommands
         else
         {
             consoleLog.LogDebug("Not writing JSON file.");
+        }
+
+        if (vtt && segments != null)
+        {
+            var vttSubtitle = Subtitle.FromSegments(segments, SubtitleType.VTT);
+            var vttOutputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFileName) + ".vtt");
+            consoleLog.Log($"Writing VTT file: {vttOutputFile}");
+            File.WriteAllText(vttOutputFile, vttSubtitle.ToString());
+        }
+        else
+        {
+            consoleLog.LogDebug("Not writing VTT file.");
         }
 
         whisperModel.Dispose();

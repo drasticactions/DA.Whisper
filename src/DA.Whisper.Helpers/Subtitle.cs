@@ -1,4 +1,4 @@
-// <copyright file="SrtSubtitle.cs" company="Drastic Actions">
+// <copyright file="Subtitle.cs" company="Drastic Actions">
 // Copyright (c) Drastic Actions. All rights reserved.
 // </copyright>
 
@@ -11,46 +11,56 @@ namespace DA.Whisper;
 /// <summary>
 /// Represents an SRT subtitle.
 /// </summary>
-public class SrtSubtitle
+public class Subtitle
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="SrtSubtitle"/> class.
+    /// Initializes a new instance of the <see cref="Subtitle"/> class.
     /// </summary>
-    public SrtSubtitle()
+    /// <param name="subtitleType">The subtitle type.</param>
+    public Subtitle(SubtitleType subtitleType = SubtitleType.SRT)
     {
+        this.SubtitleType = subtitleType;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SrtSubtitle"/> class with the specified subtitle.
+    /// Initializes a new instance of the <see cref="Subtitle"/> class with the specified subtitle.
     /// </summary>
     /// <param name="subtitle">The subtitle text.</param>
-    public SrtSubtitle(string subtitle)
+    /// <param name="subtitleType">The subtitle type.</param>
+    public Subtitle(string subtitle, SubtitleType subtitleType = SubtitleType.SRT)
     {
+        this.SubtitleType = subtitleType;
         string[] subtitleLines = Regex.Split(subtitle, @"^\s*$", RegexOptions.Multiline);
 
         for (var index = 0; index < subtitleLines.Length; index++)
         {
             var subtitleLine = subtitleLines[index];
             string subtitleLineTrimmed = subtitleLine.Trim();
-            SrtSubtitleLine block = new SrtSubtitleLine(subtitleLineTrimmed);
+            SubtitleLine block = new SubtitleLine(subtitleLineTrimmed);
             block.LineNumber = index + 1;
             this.Lines.Add(block);
         }
     }
 
     /// <summary>
+    /// Gets or sets the subtitle type.
+    /// </summary>
+    public SubtitleType SubtitleType { get; set; }
+
+    /// <summary>
     /// Gets or sets the lines.
     /// </summary>
-    public List<SrtSubtitleLine> Lines { get; set; } = new List<SrtSubtitleLine>();
+    public List<SubtitleLine> Lines { get; set; } = new List<SubtitleLine>();
 
     /// <summary>
     /// Converts a list of segments to a subtitle.
     /// </summary>
     /// <param name="segments">Segments.</param>
-    /// <returns>From SrtSubtitle.</returns>
-    public static SrtSubtitle FromSegments(List<SegmentData> segments)
+    /// <param name="subtitleType">Subtitle Type.</param>
+    /// <returns>From Subtitle.</returns>
+    public static Subtitle FromSegments(List<SegmentData> segments, SubtitleType subtitleType = SubtitleType.SRT)
     {
-        SrtSubtitle subtitle = new SrtSubtitle();
+        Subtitle subtitle = new Subtitle(subtitleType);
         foreach (var segment in segments)
         {
             subtitle.AddSegment(segment);
@@ -63,7 +73,7 @@ public class SrtSubtitle
     /// Add a line to the subtitle.
     /// </summary>
     /// <param name="line">The line.</param>
-    public void AddLine(SrtSubtitleLine line)
+    public void AddLine(SubtitleLine line)
     {
         line.LineNumber = this.Lines.Count + 1;
         this.Lines.Add(line);
@@ -75,12 +85,13 @@ public class SrtSubtitle
     /// <param name="segment">The segment.</param>
     public void AddSegment(SegmentData segment)
     {
-        SrtSubtitleLine line = new SrtSubtitleLine
+        SubtitleLine line = new SubtitleLine
         {
             LineNumber = this.Lines.Count + 1,
             Start = segment.Start,
             End = segment.End,
             Text = segment.Text,
+            SubtitleType = this.SubtitleType,
         };
         this.AddLine(line);
     }
@@ -89,6 +100,12 @@ public class SrtSubtitle
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
+        if (this.SubtitleType == SubtitleType.VTT)
+        {
+            sb.AppendLine("WEBVTT");
+            sb.AppendLine();
+        }
+
         for (int i = 0; i < this.Lines.Count; i++)
         {
             sb.Append(this.Lines[i].ToString());
