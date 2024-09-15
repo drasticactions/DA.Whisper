@@ -125,6 +125,8 @@ public class WhisperCommands
         var json = enumOutputFormats?.Contains(OutputFormat.Json) ?? false;
         var vtt = enumOutputFormats?.Contains(OutputFormat.VTT) ?? false;
 
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
         await foreach (var segment in result)
         {
             var text = printTimestamps ? $"[{segment.Start} - {segment.End}] {segment.Text}" : segment.Text;
@@ -132,11 +134,15 @@ public class WhisperCommands
             segments?.Add(segment);
         }
 
+        stopwatch.Stop();
+
         if (cancellationToken.IsCancellationRequested)
         {
             consoleLog.Log("Processing was cancelled.");
             return;
         }
+
+        consoleLog.Log($"Processing took: {stopwatch.Elapsed}");
 
         if (transcoded)
         {
