@@ -7,6 +7,7 @@ using ConsoleAppFramework;
 using DA.Whisper;
 using DA.WhisperCli;
 using Microsoft.Extensions.Logging;
+using OpenTK.Audio.OpenAL;
 
 _ = WhisperLogger.Instance;
 var app = ConsoleApp.Create();
@@ -192,6 +193,28 @@ public class WhisperCommands
         processor.Dispose();
     }
 
+    /// <summary>
+    /// Transcribe live audio to text.
+    /// </summary>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
+    /// <returns>Task.</returns>
+    [Command("realtime")]
+    public async Task RealtimeAsync(bool verbose = false, CancellationToken cancellationToken = default)
+    {
+        var consoleLog = new ConsoleLog(verbose);
+        consoleLog.LogDebug("Default Mic:\n" + ALC.GetString(ALDevice.Null, AlcGetString.CaptureDefaultDeviceSpecifier));
+        consoleLog.LogDebug("Mic List:\n" + string.Join("\n", ALC.GetString(ALDevice.Null, AlcGetStringList.CaptureDeviceSpecifier)));
+
+        await this.RecordAudioAsync(
+        (audio) =>
+        {
+            consoleLog.LogDebug($"Audio: {audio.Length}");
+        },
+        null,
+        cancellationToken: cancellationToken);
+    }
+
     /// <summary>Generates the context parameters file.</summary>
     /// <param name="outputName">Output file name.</param>
     [Command("generate-context-file")]
@@ -305,5 +328,42 @@ public class WhisperCommands
                     break;
             }
         };
+    }
+
+    private Task RecordAudioAsync(Action<byte[]> transcribeAudio, string? deviceName = null, CancellationToken cancellationToken = default)
+    {
+        int sampleRate = 16_000;
+        int bufferSize = 1024;
+        var captureDevice = ALC.CaptureOpenDevice(null, sampleRate, ALFormat.Mono16, bufferSize);
+        ALC.CaptureStart(captureDevice);
+
+        var buffer = new byte[bufferSize];
+        while (true)
+        {
+            var current = 0;
+            while (current < buffer.Length && !cancellationToken.IsCancellationRequested)
+            {
+                var samplesAvailable = ALC.GetInteger(captureDevice, AlcGetInteger.CaptureSamples);
+                if (samplesAvailable < 512)
+                {
+                    continue;
+                }
+
+                var samplesToRead = Math.Min(samplesAvailable, buffer.Length - current);
+                ALC.CaptureSamples(captureDevice, ref buffer[current], samplesToRead);
+                current += samplesToRead;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+
+            transcribeAudio(buffer.ToArray());
+        }
+
+        ALC.CaptureStop(captureDevice);
+
+        return Task.CompletedTask;
     }
 }
