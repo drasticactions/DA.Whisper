@@ -61,7 +61,7 @@ public class SubtitleLine
     /// <summary>
     /// Gets the time range of the subtitle line.
     /// </summary>
-    public string Time => $"{this.Start} -> {this.Start}";
+    public string Time => $"{this.Start} -> {this.End}";
 
     /// <summary>
     /// Gets or sets the text.
@@ -87,10 +87,20 @@ public class SubtitleLine
             sb.AppendLine(this.LineNumber.ToString());
         }
 
-        sb.Append(this.Start.ToString(@"hh\:mm\:ss\,fff"));
-        sb.Append(" --> ");
-        sb.Append(this.End.ToString(@"hh\:mm\:ss\,fff"));
-        sb.AppendLine();
+        if (this.SubtitleType == SubtitleType.SRT)
+        {
+            sb.Append(this.Start.ToString(@"hh\:mm\:ss\,fff"));
+            sb.Append(" --> ");
+            sb.Append(this.End.ToString(@"hh\:mm\:ss\,fff"));
+            sb.AppendLine();
+        }
+        else if (this.SubtitleType == SubtitleType.VTT)
+        {
+            sb.Append(this.Start.ToString(@"hh\:mm\:ss\.fff"));
+            sb.Append(" --> ");
+            sb.Append(this.End.ToString(@"hh\:mm\:ss\.fff"));
+            sb.AppendLine();
+        }
 
         sb.Append(this.Text);
 
