@@ -49,8 +49,8 @@ public class WhisperCommands
     public async Task TranscribeAsync(
         [Argument] string mediaFile,
         string model,
-        string? contextFile = default,
-        string? parameterFile = default,
+        string? contextFile = "context_file.json",
+        string? parameterFile = "full_params.json",
         SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy,
         bool transcodeFile = true,
         bool printTimestamps = false,
@@ -141,6 +141,7 @@ public class WhisperCommands
         if (transcoded)
         {
             consoleLog.LogDebug($"Deleting transcoded file: {processFile}");
+            await processFileStream.DisposeAsync();
             File.Delete(processFile);
         }
 
@@ -306,6 +307,11 @@ public class WhisperCommands
 
     private ContextParams? GetContextParams(string? contextFile)
     {
+        if (!File.Exists(contextFile))
+        {
+            return ContextParams.FromDefault();
+        }
+
         if (contextFile != null)
         {
             try
@@ -324,7 +330,7 @@ public class WhisperCommands
 
     private FullParams? GetFullParams(string? parameterFile, SamplingStrategy defaultSamplingStrategy)
     {
-        if (parameterFile != null)
+        if (File.Exists(parameterFile))
         {
             try
             {

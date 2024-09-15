@@ -182,6 +182,12 @@ public sealed class WhisperModel : IDisposable
     {
         try
         {
+            if (!File.Exists(modelPath))
+            {
+                model = null;
+                return false;
+            }
+
             model = new WhisperModel(modelPath, contextParams);
             return model?.IsInitialized ?? false;
         }

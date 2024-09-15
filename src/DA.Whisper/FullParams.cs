@@ -434,6 +434,7 @@ public class FullParams
     /// <summary>
     /// Gets the underlying whisper_full_params object.
     /// </summary>
+    [JsonIgnore]
     internal ref whisper_full_params Params => ref this.@params;
 
     /// <summary>

@@ -84,19 +84,19 @@ public class ContextParams
     /// <summary>
     /// Gets or sets the memory size for DTW.
     /// </summary>
-    public nuint DtwMemSize
+    public int DtwMemSize
     {
-        get => this.@params.dtw_mem_size;
-        set => this.@params.dtw_mem_size = value;
+        get => (int)this.@params.dtw_mem_size;
+        set => this.@params.dtw_mem_size = (nuint)value;
     }
 
     /// <summary>
     /// Gets or sets the number of DTW aheads.
     /// </summary>
-    public nuint NumberOfAheads
+    public int NumberOfAheads
     {
-        get => this.@params.dtw_aheads.n_heads;
-        set => this.@params.dtw_aheads.n_heads = value;
+        get => (int)this.@params.dtw_aheads.n_heads;
+        set => this.@params.dtw_aheads.n_heads = (nuint)value;
     }
 
     /// <summary>
@@ -127,6 +127,7 @@ public class ContextParams
     /// <summary>
     /// Gets the context parameters.
     /// </summary>
+    [JsonIgnore]
     internal ref whisper_context_params Params => ref this.@params;
 
     /// <summary>
@@ -146,12 +147,12 @@ public class ContextParams
     }
 
     /// <summary>
-    /// Converts the <see cref="FullParams"/> object to a JSON string.
+    /// Converts the <see cref="ContextParams"/> object to a JSON string.
     /// </summary>
     /// <returns>JSON string of full params.</returns>
     public string ToJson()
     {
-        return JsonSerializer.Serialize(this, SourceGenerationContext.Default.FullParams);
+        return JsonSerializer.Serialize(this, SourceGenerationContext.Default.ContextParams);
     }
 
     /// <inheritdoc/>
