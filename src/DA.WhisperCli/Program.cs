@@ -203,6 +203,12 @@ public class WhisperCommands
     public async Task RealtimeAsync(bool verbose = false, CancellationToken cancellationToken = default)
     {
         var consoleLog = new ConsoleLog(verbose);
+
+#if RELEASE
+        consoleLog.LogError("Realtime transcription is not implemented.");
+        return;
+#endif
+
         consoleLog.LogDebug("Default Mic:\n" + ALC.GetString(ALDevice.Null, AlcGetString.CaptureDefaultDeviceSpecifier));
         consoleLog.LogDebug("Mic List:\n" + string.Join("\n", ALC.GetString(ALDevice.Null, AlcGetStringList.CaptureDeviceSpecifier)));
 
