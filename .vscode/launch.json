@@ -35,6 +35,17 @@
             "stopAtEntry": false
         },
         {
+            "name": "DA.WhisperCli (youtube)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/DA.WhisperCli/bin/Debug/net9.0/DA.WhisperCli.dll",
+            "args": ["transcribe", "youtube", "https://www.youtube.com/watch?v=3k7Q3DxDp3o", "--model", "${workspaceFolder}/models/ggml-tiny.bin", "-v"],
+            "cwd": "${workspaceFolder}/src/DA.WhisperCli",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"

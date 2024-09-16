@@ -33,6 +33,71 @@ public class FFMpegTranscodeService : ITranscodeService, IDisposable
     /// <inheritdoc/>
     public string BasePath => this.basePath;
 
+    /// <summary>
+    /// Process a stream.
+    /// </summary>
+    /// <param name="stream">Stream.</param>
+    /// <returns>Output Path.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if input value not valid.</exception>
+    public async Task<string> ProcessStream(Stream stream)
+    {
+        StreamPipeSource uri = new StreamPipeSource(stream);
+        var outputfile = Path.Combine(this.basePath, $"{this.generatedFilename ?? Path.GetRandomFileName()}.wav");
+        var arguments = FFMpegArguments
+            .FromPipeInput(uri)
+            .OutputToFile(
+            outputfile,
+            true,
+            options => options.WithAudioCodec("pcm_s16le").WithAudioSamplingRate(16000));
+        this.logger?.LogInformation($"Transcoding file to: {outputfile}");
+
+        var result = await arguments.ProcessAsynchronously();
+
+        if (!result)
+        {
+            this.logger?.LogError("FFMpeg failed to transcode file.");
+            throw new InvalidOperationException("FFMpeg failed to transcode file.");
+        }
+
+        this.logger?.LogInformation($"Transcoded file to: {outputfile}");
+        return outputfile;
+    }
+
+    /// <summary>
+    /// Process a URI.
+    /// </summary>
+    /// <param name="internetUri">Internet Uri.</param>
+    /// <returns>Output Path.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if input value not valid.</exception>
+    public async Task<string> ProcessUri(string internetUri)
+    {
+        if (!Uri.TryCreate(internetUri, UriKind.Absolute, out var uri))
+        {
+            this.logger?.LogError("Invalid URI.");
+            throw new InvalidOperationException("Invalid URI.");
+        }
+
+        var outputfile = Path.Combine(this.basePath, $"{this.generatedFilename ?? Path.GetRandomFileName()}.wav");
+        var arguments = FFMpegArguments
+            .FromUrlInput(uri)
+            .OutputToFile(
+            outputfile,
+            true,
+            options => options.WithAudioCodec("pcm_s16le").WithAudioSamplingRate(16000));
+        this.logger?.LogInformation($"Transcoding file to: {outputfile}");
+
+        var result = await arguments.ProcessAsynchronously();
+
+        if (!result)
+        {
+            this.logger?.LogError("FFMpeg failed to transcode file.");
+            throw new InvalidOperationException("FFMpeg failed to transcode file.");
+        }
+
+        this.logger?.LogInformation($"Transcoded file to: {outputfile}");
+        return outputfile;
+    }
+
     /// <inheritdoc/>
     public async Task<(string FilePath, bool Transcoded)> ProcessFile(string file)
     {

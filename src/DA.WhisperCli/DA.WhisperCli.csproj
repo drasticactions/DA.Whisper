@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
     <PackageReference Include="OpenTK" />
     <PackageReference Include="OpenTK.Audio.OpenAL" />
+    <PackageReference Include="YoutubeExplode" />
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>

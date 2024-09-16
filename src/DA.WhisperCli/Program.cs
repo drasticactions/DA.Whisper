@@ -3,12 +3,14 @@
 // </copyright>
 
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using ConsoleAppFramework;
 using DA.Whisper;
 using DA.WhisperCli;
 using Downloader;
 using Microsoft.Extensions.Logging;
 using OpenTK.Audio.OpenAL;
+using YoutubeExplode.Videos.Streams;
 
 _ = WhisperLogger.Instance;
 var app = ConsoleApp.Create();
@@ -29,6 +31,69 @@ public class WhisperCommands
     public void GetSystemInfo()
     {
         Console.WriteLine(Whisper.GetSystemInfo());
+    }
+
+    /// <summary>Transcribe YouTube video to text.</summary>
+    /// <param name="youtubeId">Youtube Id to transcribe.</param>
+    /// <param name="model">-m, Whisper Model.</param>
+    /// <param name="contextFile">-c, Optional Context Parameter file. Generate the file with 'generate-context-file'.</param>
+    /// <param name="parameterFile">-p, Optional Parameter file. Generate the file with 'generate-parameter-file'.</param>
+    /// <param name="defaultSamplingStrategy">-s, Default Sampling Strategy, ignored if parameter file is used.</param>
+    /// <param name="printTimestamps">-ts, Print timestamps with the text.</param>
+    /// <param name="outputFormats">-f, Output the text to files.</param>
+    /// <param name="outputDirectory">-o, Output directory for the subtitle file, defaults to the current working directory.</param>
+    /// <param name="outputFilename">-of, Output file name for the subtitle file, defaults to the name of the media file if available.</param>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
+    /// <returns>Task.</returns>
+    [Command("transcribe youtube")]
+    public async Task TranscribeYoutubeAsync(
+        [Argument] string youtubeId,
+        string model,
+        string? contextFile = "context_file.json",
+        string? parameterFile = "full_params.json",
+        SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy,
+        bool printTimestamps = false,
+        string[]? outputFormats = default,
+        string? outputDirectory = default,
+        string? outputFilename = default,
+        bool verbose = false,
+        CancellationToken cancellationToken = default)
+    {
+        var consoleLog = new ConsoleLog(verbose);
+        var ffmpeg = new FFMpegTranscodeService(logger: this.SetupLogger("ffmpeg", verbose));
+
+        var ytId = YoutubeExplode.Videos.VideoId.TryParse(youtubeId);
+        if (!ytId.HasValue)
+        {
+            consoleLog.LogError("Invalid YouTube Id.");
+            return;
+        }
+
+        var youtube = new YoutubeExplode.YoutubeClient();
+        var video = await youtube.Videos.GetAsync(ytId.Value);
+        consoleLog.Log($"Processing video: {video.Title}");
+        var filename = this.MakeValidFileName(video.Title);
+        var videoStreamInfoSet = await youtube.Videos.Streams.GetManifestAsync(ytId.Value);
+        var audioStreamInfo = videoStreamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
+        if (audioStreamInfo is null)
+        {
+            consoleLog.LogError("No audio stream found.");
+            return;
+        }
+
+        var audioStream = await youtube.Videos.Streams.GetAsync(audioStreamInfo);
+        if (audioStream is null)
+        {
+            consoleLog.LogError("Unable to download audio stream.");
+            return;
+        }
+
+        var processResult = await ffmpeg.ProcessUri(audioStreamInfo.Url);
+
+        outputFilename = outputFilename ?? filename;
+        await this.TranscribeAsync(processResult, model, contextFile, parameterFile, defaultSamplingStrategy, false, printTimestamps, outputFormats, outputDirectory, outputFilename, verbose, cancellationToken);
+        File.Delete(processResult);
     }
 
     /// <summary>
@@ -221,7 +286,7 @@ public class WhisperCommands
         {
             var subtitle = Subtitle.FromSegments(segments);
 
-            var outputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFileName) + ".srt");
+            var outputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".srt");
             consoleLog.Log($"Writing SRT file: {outputFile}");
             File.WriteAllText(outputFile, subtitle.ToString());
         }
@@ -232,7 +297,7 @@ public class WhisperCommands
 
         if (json && segments != null)
         {
-            var jsonOutputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFileName) + ".json");
+            var jsonOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".json");
             consoleLog.Log($"Writing JSON file: {jsonOutputFile}");
             File.WriteAllText(jsonOutputFile, segments.ToJson());
         }
@@ -244,7 +309,7 @@ public class WhisperCommands
         if (vtt && segments != null)
         {
             var vttSubtitle = Subtitle.FromSegments(segments, SubtitleType.VTT);
-            var vttOutputFile = Path.Combine(outputDir, outputFilename ?? Path.GetFileNameWithoutExtension(mediaFileName) + ".vtt");
+            var vttOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".vtt");
             consoleLog.Log($"Writing VTT file: {vttOutputFile}");
             File.WriteAllText(vttOutputFile, vttSubtitle.ToString());
         }
@@ -498,5 +563,18 @@ public class WhisperCommands
         ALC.CaptureStop(captureDevice);
 
         return Task.CompletedTask;
+    }
+
+    private string MakeValidFileName(string input)
+    {
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        string validName = Regex.Replace(input, $"[{Regex.Escape(new string(invalidChars))}]", "_");
+        validName = validName.Trim();
+        if (validName.Length > 255)
+        {
+            validName = validName.Substring(0, 255);
+        }
+
+        return validName;
     }
 }
