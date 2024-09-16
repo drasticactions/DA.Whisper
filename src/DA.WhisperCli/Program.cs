@@ -74,6 +74,12 @@ public class WhisperCommands
         var video = await youtube.Videos.GetAsync(ytId.Value);
         consoleLog.Log($"Processing video: {video.Title}");
         var filename = this.MakeValidFileName(video.Title);
+        if (!this.CanWriteFileName(filename))
+        {
+            consoleLog.LogError("Unable to write filename.");
+            return;
+        }
+
         var videoStreamInfoSet = await youtube.Videos.Streams.GetManifestAsync(ytId.Value);
         var audioStreamInfo = videoStreamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
         if (audioStreamInfo is null)
@@ -108,7 +114,7 @@ public class WhisperCommands
     [Command("convert-json")]
     public async Task ConvertJsonToSubtitleFileAsync([Argument] string jsonFile, string[]? outputFormats = default, string? outputDirectory = default, bool verbose = false, CancellationToken cancellationToken = default)
     {
-        outputFormats = outputFormats ?? Array.Empty<string>();
+        outputFormats = outputFormats ?? new[] { "json" };
         var consoleLog = new ConsoleLog(verbose);
         if (outputFormats.Length == 0)
         {
@@ -576,5 +582,26 @@ public class WhisperCommands
         }
 
         return validName;
+    }
+
+    private bool CanWriteFileName(string fileName)
+    {
+        string tempPath = Path.GetTempPath();
+        string tempFile = Path.Combine(tempPath, fileName);
+
+        try
+        {
+            using (FileStream fs = File.Create(tempFile))
+            {
+                fs.Close();
+            }
+
+            File.Delete(tempFile);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
