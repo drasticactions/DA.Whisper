@@ -7,9 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\external\DA.UI\src\DA.UI.iOS\DA.UI.iOS.csproj" />
-    <ProjectReference Include="..\..\..\..\external\DA.UI\src\DA.UI\DA.UI.csproj" />
     <ProjectReference Include="..\..\..\DA.Whisper\DA.Whisper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DrasticActions.UI.iOS" />
   </ItemGroup>
 
 </Project>

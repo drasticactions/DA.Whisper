@@ -4,6 +4,7 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="DrasticActions.UI.iOS" Version="0.0.1-preview" />
     <PackageVersion Include="FFMpegCore" Version="5.1.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0-rc.1.24431.7" />
     <PackageVersion Include="LibVLCSharp" Version="3.9.0" />

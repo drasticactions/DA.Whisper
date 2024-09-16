@@ -7,10 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcribe.iOS", "Transcrib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DA.Whisper", "..\..\DA.Whisper\DA.Whisper.csproj", "{56E8CED2-8688-4DB1-B82A-93E09B294F07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DA.UI", "..\..\..\external\DA.UI\src\DA.UI\DA.UI.csproj", "{ACB702EE-1E6C-42E4-9FE7-54F08EF8A7E2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DA.UI.iOS", "..\..\..\external\DA.UI\src\DA.UI.iOS\DA.UI.iOS.csproj", "{B483BF5E-8964-46F3-8B89-E49B181B34AE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcribe.MacCatalyst", "Transcribe.MacCatalyst\Transcribe.MacCatalyst.csproj", "{5CA57EAB-8836-494A-A382-0119BC95620F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transcribe.Apple", "Transcribe.Apple\Transcribe.Apple.csproj", "{69D7D9A8-D7E1-45E4-B6C4-679B753C1A22}"
@@ -32,14 +28,6 @@ Global
 		{56E8CED2-8688-4DB1-B82A-93E09B294F07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56E8CED2-8688-4DB1-B82A-93E09B294F07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56E8CED2-8688-4DB1-B82A-93E09B294F07}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ACB702EE-1E6C-42E4-9FE7-54F08EF8A7E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ACB702EE-1E6C-42E4-9FE7-54F08EF8A7E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ACB702EE-1E6C-42E4-9FE7-54F08EF8A7E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ACB702EE-1E6C-42E4-9FE7-54F08EF8A7E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B483BF5E-8964-46F3-8B89-E49B181B34AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B483BF5E-8964-46F3-8B89-E49B181B34AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B483BF5E-8964-46F3-8B89-E49B181B34AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B483BF5E-8964-46F3-8B89-E49B181B34AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CA57EAB-8836-494A-A382-0119BC95620F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CA57EAB-8836-494A-A382-0119BC95620F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CA57EAB-8836-494A-A382-0119BC95620F}.Release|Any CPU.ActiveCfg = Release|Any CPU

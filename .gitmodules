@@ -1,6 +1,3 @@
 [submodule "external/whisper.cpp"]
 	path = external/whisper.cpp
 	url = git@github.com:ggerganov/whisper.cpp.git
-[submodule "external/DA.UI"]
-	path = external/DA.UI
-	url = git@github.com:drasticactions/DA.UI.git
