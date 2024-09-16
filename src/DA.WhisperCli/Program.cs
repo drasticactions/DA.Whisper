@@ -31,6 +31,62 @@ public class WhisperCommands
         Console.WriteLine(Whisper.GetSystemInfo());
     }
 
+    /// <summary>
+    /// Convert a JSON file to a subtitle file.
+    /// </summary>
+    /// <param name="jsonFile">JSON output file.</param>
+    /// <param name="outputFormats">-f, Output the text to files.</param>
+    /// <param name="outputDirectory">-o, Output directory for the subtitle file, defaults to the current working directory.</param>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
+    /// <returns>Task.</returns>
+    [Command("convert-json")]
+    public async Task ConvertJsonToSubtitleFileAsync([Argument] string jsonFile, string[]? outputFormats = default, string? outputDirectory = default, bool verbose = false, CancellationToken cancellationToken = default)
+    {
+        outputFormats = outputFormats ?? Array.Empty<string>();
+        var consoleLog = new ConsoleLog(verbose);
+        if (outputFormats.Length == 0)
+        {
+            consoleLog.LogError("No output formats specified.");
+            return;
+        }
+
+        if (!File.Exists(jsonFile))
+        {
+            consoleLog.LogError("JSON file does not exist.");
+            return;
+        }
+
+        var json = File.ReadAllText(jsonFile);
+        var segments = JsonSerializer.Deserialize<List<SegmentData>>(json, SourceGenerationContext.Default.ListSegmentData);
+        if (segments == null)
+        {
+            consoleLog.LogError("Unable to deserialize JSON file.");
+            return;
+        }
+
+        var srt = outputFormats.Contains("srt", StringComparer.OrdinalIgnoreCase);
+        var vtt = outputFormats.Contains("vtt", StringComparer.OrdinalIgnoreCase);
+
+        var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
+
+        if (srt)
+        {
+            var subtitle = Subtitle.FromSegments(segments);
+            var outputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(jsonFile) + ".srt");
+            consoleLog.Log($"Writing SRT file: {outputFile}");
+            await File.WriteAllTextAsync(outputFile, subtitle.ToString(), cancellationToken);
+        }
+
+        if (vtt)
+        {
+            var vttSubtitle = Subtitle.FromSegments(segments, SubtitleType.VTT);
+            var vttOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(jsonFile) + ".vtt");
+            consoleLog.Log($"Writing VTT file: {vttOutputFile}");
+            await File.WriteAllTextAsync(vttOutputFile, vttSubtitle.ToString(), cancellationToken);
+        }
+    }
+
     /// <summary>Transcribe media file to text.</summary>
     /// <param name="mediaFile">Media file to transcribe.</param>
     /// <param name="model">-m, Whisper Model.</param>
@@ -40,8 +96,8 @@ public class WhisperCommands
     /// <param name="transcodeFile">-t, Transcode the file using ffmpeg to a format that Whisper can process. Requires ffmpeg to be installed.</param>
     /// <param name="printTimestamps">-ts, Print timestamps with the text.</param>
     /// <param name="outputFormats">-f, Output the text to files.</param>
-    /// <param name="outputDirectory">-o, Output directory for the SRT file, defaults to the current working directory.</param>
-    /// <param name="outputFilename">-of, Output file name for the SRT file, defaults to the name of the media file if available.</param>
+    /// <param name="outputDirectory">-o, Output directory for the subtitle file, defaults to the current working directory.</param>
+    /// <param name="outputFilename">-of, Output file name for the subtitle file, defaults to the name of the media file if available.</param>
     /// <param name="verbose">-v, Verbose logging.</param>
     /// <param name="cancellationToken">Cancellation Token.</param>
     /// <returns>Task.</returns>
