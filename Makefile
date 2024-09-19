@@ -29,6 +29,22 @@ macos_runtime_verify:
 	fi
 	@echo "The macOS runtime was made."
 
+linux_core_runtime_verify:
+	@echo "Checking if the Linux x64 core runtime was made..."
+	@if [ ! -f runtime/linux-x64-core/libwhisper.so ]; then \
+		echo "The Linux x64 core runtime was not made. Please run 'make linux_x64_core'."; \
+		exit 1; \
+	fi
+	@echo "The Linux x64 core runtime was made."
+
+linux_cuda_runtime_verify:
+	@echo "Checking if the Linux x64 CUDA runtime was made..."
+	@if [ ! -f runtime/linux-x64-cuda/libwhisper.so ]; then \
+		echo "The Linux x64 CUDA runtime was not made. Please run 'make linux_x64_cuda'."; \
+		exit 1; \
+	fi
+	@echo "The Linux x64 CUDA runtime was made."
+
 wasm: wasm_verify
 	rm -rf build/wasm
 	emcmake cmake -S $(PROJECT_ROOT) -B build/wasm $(CMAKE_PARAMETERS) -DBUILD_SHARED_LIBS=ON
@@ -38,6 +54,22 @@ wasm: wasm_verify
 	cp build/wasm/ggml/src/libggml.a runtime/browser-wasm/ggml.a
 
 apple: apple_verify macos ios_simulator_x64 ios_simulator_arm64 lipo_ios_simulator ios maccatalyst_x64 maccatalyst_arm64 lipo_maccatalyst
+
+linux_x64_core:
+	rm -rf build/linux-x64-core
+	cmake $(PROJECT_ROOT) $(CMAKE_PARAMETERS) -DCMAKE_BUILD_TYPE=Release -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=ON -B $(ROOT)/build/linux-x64-core
+	cmake --build build/linux-x64-core
+	mkdir -p runtime/linux-x64-core
+	cp $(ROOT)/build/linux-x64-core/src/libwhisper.so runtime/linux-x64-core/libwhisper.so
+	cp $(ROOT)/build/linux-x64-core/ggml/src/libggml.so runtime/linux-x64-core/libggml.so
+
+linux_x64_cuda:
+	rm -rf build/linux-x64-cuda
+	CUDACXX=/usr/local/cuda/bin/nvcc cmake $(PROJECT_ROOT) $(CMAKE_PARAMETERS) -DWHISPER_CCACHE=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=Release -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_EXAMPLES=OFF -DGGML_CUDA=ON -DGGML_CUDA_F16=ON -DBUILD_SHARED_LIBS=ON -B $(ROOT)/build/linux-x64-cuda
+	cmake --build build/linux-x64-cuda
+	mkdir -p runtime/linux-x64-cuda
+	cp $(ROOT)/build/linux-x64-cuda/src/libwhisper.so runtime/linux-x64-cuda/libwhisper.so
+	cp $(ROOT)/build/linux-x64-cuda/ggml/src/libggml.so runtime/linux-x64-cuda/libggml.so
 
 macos:
 	rm -rf build/macos
@@ -124,6 +156,18 @@ macos_release_arm64_artifact: macos_runtime_verify
 macos_release_arm64_model: macos_runtime_verify
 	mkdir -p model
 	dotnet publish $(WHISPERCLI) -c Release -o model -r osx-arm64
+
+linux_core_x64_artifact: linux_core_runtime_verify
+	mkdir -p artifacts/linux-x64-core
+	dotnet build $(WHISPERCLI) -c Release -o artifacts/linux-x64-core -r linux-x64
+
+linux_cuda_x64_artifact: linux_cuda_runtime_verify
+	mkdir -p artifacts/linux-x64-cuda
+	dotnet build $(WHISPERCLI) -p:EnableCuda=true -c Release -o artifacts/linux-x64-cuda
+
+linux_cuda_x64_model: linux_cuda_runtime_verify
+	mkdir -p model
+	dotnet build $(WHISPERCLI) -p:EnableCuda=true -c Release -o model
 
 download_tiny_model:
 	mkdir -p model

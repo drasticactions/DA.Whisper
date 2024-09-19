@@ -6,6 +6,7 @@
         <IsWindows>$([MSBuild]::IsOSPlatform('Windows'))</IsWindows>
         <IsLinux>$([MSBuild]::IsOSPlatform('Linux'))</IsLinux>
         <IsOSX>$([MSBuild]::IsOSPlatform('OSX'))</IsOSX>
+        <EnableCuda Condition="'$(EnableCuda)' == ''">false</EnableCuda>
     </PropertyGroup>
     <ItemGroup Condition="(('$(Platform)' == 'iPhoneSimulator') OR $(RuntimeIdentifier.StartsWith('iossimulator')))">
         <None Visible="false" Include="$(MSBuildThisFileDirectory)ios-simulator\libwhisper.dylib">
@@ -65,6 +66,34 @@
             <PackageCopyToOutput>true</PackageCopyToOutput>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <TargetPath>libwhisper.dylib</TargetPath>
+        </None>
+    </ItemGroup>
+    <ItemGroup Condition="$(TargetFramework.Contains('-')) == false AND $(IsLinux) AND $(EnableCuda) == false">
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)linux-x64-core\libwhisper.so">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>libwhisper.so</TargetPath>
+        </None>
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)linux-x64-core\libggml.so">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>libggml.so</TargetPath>
+        </None>
+    </ItemGroup>
+    <ItemGroup Condition="$(TargetFramework.Contains('-')) == false AND $(IsLinux) AND $(EnableCuda)">
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)linux-x64-cuda\libwhisper.so">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>libwhisper.so</TargetPath>
+        </None>
+        <None Visible="false" Include="$(MSBuildThisFileDirectory)linux-x64-cuda\libggml.so">
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>libggml.so</TargetPath>
         </None>
     </ItemGroup>
 </Project>
