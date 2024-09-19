@@ -187,7 +187,7 @@ public class WhisperCommands
         bool verbose = false,
         CancellationToken cancellationToken = default)
     {
-        outputFormats = outputFormats ?? Array.Empty<string>();
+        outputFormats = outputFormats ?? new[] { "json" };
         var consoleLog = new ConsoleLog(verbose);
         this.SetupWhisperLogger(verbose);
         var ffmpeg = new FFMpegTranscodeService(logger: this.SetupLogger("ffmpeg", verbose));
