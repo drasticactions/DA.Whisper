@@ -120,6 +120,20 @@ public sealed class WhisperProcessor : IAsyncDisposable, IDisposable
         }
     }
 
+     /// <summary>
+    /// Processes the audio stream asynchronously.
+    /// </summary>
+    /// <param name="samples">The audio stream.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An asynchronous enumerable of segment data.</returns>
+    public async IAsyncEnumerable<SegmentData> ProcessRawAsync(float[] samples, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await foreach (var segmentData in this.ProcessAsync(samples, cancellationToken))
+        {
+            yield return segmentData;
+        }
+    }
+
     /// <summary>
     /// Processes the audio samples asynchronously.
     /// </summary>

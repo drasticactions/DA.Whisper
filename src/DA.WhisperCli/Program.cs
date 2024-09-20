@@ -393,21 +393,96 @@ public class WhisperCommands
     /// <summary>
     /// Transcribe live audio to text.
     /// </summary>
+    /// <param name="model">-m, Whisper Model.</param>
     /// <param name="verbose">-v, Verbose logging.</param>
     /// <param name="cancellationToken">Cancellation Token.</param>
     /// <returns>Task.</returns>
     [Command("realtime")]
-    public async Task RealtimeAsync(bool verbose = false, CancellationToken cancellationToken = default)
+    public async Task RealtimeAsync(string model, bool verbose = false, CancellationToken cancellationToken = default)
     {
         var consoleLog = new ConsoleLog(verbose);
+        this.SetupWhisperLogger(verbose);
+        if (!WhisperModel.TryFromFileWithParameters(model, ContextParams.FromDefault(), out WhisperModel? whisperModel) || whisperModel is null)
+        {
+            consoleLog.LogError("Unable to load model.");
+            return;
+        }
+
+        if (!WhisperProcessor.TryCreateWithParams(whisperModel, FullParams.FromGreedyStrategy(), out WhisperProcessor? processor) || processor is null)
+        {
+            consoleLog.LogError("Unable to create processor.");
+            return;
+        }
 
         consoleLog.LogDebug("Default Mic:\n" + ALC.GetString(ALDevice.Null, AlcGetString.CaptureDefaultDeviceSpecifier));
         consoleLog.LogDebug("Mic List:\n" + string.Join("\n", ALC.GetString(ALDevice.Null, AlcGetStringList.CaptureDeviceSpecifier)));
-
+        var isRecording = false;
+        var length = 0;
+        var totalLength = 1024 * 100;
+        var byteSample = new byte[totalLength];
         await this.RecordAudioAsync(
         (audio) =>
         {
-            consoleLog.LogDebug($"Audio: {audio.Length}");
+            var hasSpeech = DetectSpeech(audio);
+            if (hasSpeech && !isRecording)
+            {
+                consoleLog.Log("Recording...");
+                isRecording = true;
+            }
+
+            if (isRecording)
+            {
+                Array.Copy(audio, 0, byteSample, length, audio.Length);
+                length += audio.Length;
+            }
+
+            if (isRecording && (!hasSpeech || length >= totalLength))
+            {
+                // Create a new byte array based on the current length
+                var newArray = byteSample = new byte[totalLength];
+                Array.Copy(byteSample, 0, newArray, 0, length);
+                Task.Run(async () => await ProcessSamples(newArray));
+                lock (this)
+                {
+                    byteSample = new byte[totalLength];
+                    isRecording = false;
+                }
+
+                consoleLog.Log("Done...");
+            }
+
+            async Task ProcessSamples(byte[] byteSample)
+            {
+                var floatSample = new float[totalLength / 2];
+                for (int i = 0; i < totalLength / 2; i++)
+                {
+                    floatSample[i] = BitConverter.ToInt16(byteSample, i * 2) / 32768f;
+                }
+
+                var result = processor.ProcessRawAsync(floatSample, cancellationToken);
+                await foreach (var segment in result)
+                {
+                    consoleLog.Log(segment.Text);
+                }
+            }
+
+            bool DetectSpeech(byte[] audioData)
+            {
+                var sum = 0;
+                for (int i = 0; i < audioData.Length; i += 2)
+                {
+                    var sample = BitConverter.ToInt16(audioData, i);
+                    if (sample < -32768f)
+                    {
+                        return true;
+                    }
+
+                    sum += Math.Abs(sample);
+                }
+
+                var avg = sum / (audioData.Length / 2);
+                return avg > 1000;
+            }
         },
         null,
         cancellationToken: cancellationToken);
