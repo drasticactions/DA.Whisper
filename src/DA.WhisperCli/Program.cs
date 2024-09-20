@@ -416,36 +416,51 @@ public class WhisperCommands
 
         consoleLog.LogDebug("Default Mic:\n" + ALC.GetString(ALDevice.Null, AlcGetString.CaptureDefaultDeviceSpecifier));
         consoleLog.LogDebug("Mic List:\n" + string.Join("\n", ALC.GetString(ALDevice.Null, AlcGetStringList.CaptureDeviceSpecifier)));
+        var totalLength = 1024 * 100;
         var isRecording = false;
         var length = 0;
-        var totalLength = 1024 * 100;
         var byteSample = new byte[totalLength];
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         await this.RecordAudioAsync(
         (audio) =>
         {
             var hasSpeech = DetectSpeech(audio);
+
             if (hasSpeech && !isRecording)
             {
                 consoleLog.Log("Recording...");
                 isRecording = true;
             }
 
-            if (isRecording)
+            if (hasSpeech)
+            {
+                stopwatch.Reset();
+                stopwatch.Restart();
+            }
+
+            var lengthMet = length >= totalLength;
+
+            if (isRecording && !lengthMet)
             {
                 Array.Copy(audio, 0, byteSample, length, audio.Length);
                 length += audio.Length;
             }
 
-            if (isRecording && (!hasSpeech || length >= totalLength))
+            var snapshot = isRecording && (stopwatch.ElapsedMilliseconds > 1500 || lengthMet);
+
+            if (isRecording && snapshot)
             {
                 // Create a new byte array based on the current length
-                var newArray = byteSample = new byte[totalLength];
-                Array.Copy(byteSample, 0, newArray, 0, length);
-                Task.Run(async () => await ProcessSamples(newArray));
                 lock (this)
                 {
-                    byteSample = new byte[totalLength];
+                    stopwatch.Stop();
+                    stopwatch.Reset();
                     isRecording = false;
+                    var newArray = new byte[totalLength];
+                    Array.Copy(byteSample, 0, newArray, 0, length);
+                    byteSample = new byte[totalLength];
+                    Task.Run(async () => await ProcessSamples(newArray));
+                    length = 0;
                 }
 
                 consoleLog.Log("Done...");

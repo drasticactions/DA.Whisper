@@ -29,7 +29,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/src/DA.WhisperCli/bin/Debug/net9.0/DA.WhisperCli.dll",
-            "args": ["realtime", "--model", "${workspaceFolder}/model/ggml-tiny.bin", "-v"],
+            "args": ["realtime", "--model", "${workspaceFolder}/model/ggml-medium-q5_0.bin", "-v"],
             "cwd": "${workspaceFolder}/src/DA.WhisperCli",
             "console": "internalConsole",
             "stopAtEntry": false
@@ -40,7 +40,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/src/DA.WhisperCli/bin/Debug/net9.0/DA.WhisperCli.dll",
-            "args": ["transcribe", "youtube", "https://www.youtube.com/watch?v=3k7Q3DxDp3o", "--model", "${workspaceFolder}/models/ggml-tiny.bin", "-v"],
+            "args": ["transcribe", "youtube", "https://www.youtube.com/watch?v=3k7Q3DxDp3o", "--model", "${workspaceFolder}/models/ggml-medium-q5_0.bin", "-v"],
             "cwd": "${workspaceFolder}/src/DA.WhisperCli",
             "console": "internalConsole",
             "stopAtEntry": false
