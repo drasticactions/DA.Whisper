@@ -33,6 +33,54 @@ public class WhisperCommands
         Console.WriteLine(Whisper.GetSystemInfo());
     }
 
+    /// <summary>Transcribe directory of media. Not recursive.</summary>
+    /// <param name="directory">Directory to transcribe.</param>
+    /// <param name="model">-m, Whisper Model.</param>
+    /// <param name="contextFile">-c, Optional Context Parameter file. Generate the file with 'generate-context-file'.</param>
+    /// <param name="parameterFile">-p, Optional Parameter file. Generate the file with 'generate-parameter-file'.</param>
+    /// <param name="extensions">-e, File extensions to transcribe.</param>
+    /// <param name="defaultSamplingStrategy">-s, Default Sampling Strategy, ignored if parameter file is used.</param>
+    /// <param name="printTimestamps">-ts, Print timestamps with the text.</param>
+    /// <param name="force">-fo, Force overwrite of existing files.</param>
+    /// <param name="outputFormats">-f, Output the text to files.</param>
+    /// <param name="outputDirectory">-o, Output directory for the subtitle file, defaults to the current working directory.</param>
+    /// <param name="outputFilename">-of, Output file name for the subtitle file, defaults to the name of the media file if available.</param>
+    /// <param name="verbose">-v, Verbose logging.</param>
+    /// <param name="cancellationToken">Cancellation Token.</param>
+    /// <returns>Task.</returns>
+    [Command("transcribe directory")]
+    public async Task TranscribeDirectoryAsync(
+    [Argument] string directory,
+    string model,
+    string? contextFile = "context_file.json",
+    string? parameterFile = "full_params.json",
+    string[]? extensions = default,
+    SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy,
+    bool printTimestamps = false,
+    bool force = false,
+    string[]? outputFormats = default,
+    string? outputDirectory = default,
+    string? outputFilename = default,
+    bool verbose = false,
+    CancellationToken cancellationToken = default)
+    {
+        extensions = extensions ?? new[] { ".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv", ".wmv", ".mp3", ".wav", ".flac", ".ogg" };
+        outputFormats = outputFormats ?? new[] { "json" };
+        var consoleLog = new ConsoleLog(verbose);
+        var files = Directory.GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly).Where(f => extensions.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase)).ToList();
+        if (files.Count == 0)
+        {
+            consoleLog.LogError("No files found.");
+            return;
+        }
+
+        foreach (var file in files)
+        {
+            consoleLog.Log($"Processing file: {file}");
+            await this.TranscribeAsync(file, model, contextFile, parameterFile, defaultSamplingStrategy, true, printTimestamps, force, outputFormats, outputDirectory, outputFilename, verbose, cancellationToken);
+        }
+    }
+
     /// <summary>Transcribe YouTube video to text.</summary>
     /// <param name="youtubeId">Youtube Id to transcribe.</param>
     /// <param name="model">-m, Whisper Model.</param>
@@ -40,6 +88,7 @@ public class WhisperCommands
     /// <param name="parameterFile">-p, Optional Parameter file. Generate the file with 'generate-parameter-file'.</param>
     /// <param name="defaultSamplingStrategy">-s, Default Sampling Strategy, ignored if parameter file is used.</param>
     /// <param name="printTimestamps">-ts, Print timestamps with the text.</param>
+    /// <param name="force">-fo, Force overwrite of existing files.</param>
     /// <param name="outputFormats">-f, Output the text to files.</param>
     /// <param name="outputDirectory">-o, Output directory for the subtitle file, defaults to the current working directory.</param>
     /// <param name="outputFilename">-of, Output file name for the subtitle file, defaults to the name of the media file if available.</param>
@@ -54,6 +103,7 @@ public class WhisperCommands
         string? parameterFile = "full_params.json",
         SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy,
         bool printTimestamps = false,
+        bool force = false,
         string[]? outputFormats = default,
         string? outputDirectory = default,
         string? outputFilename = default,
@@ -98,7 +148,7 @@ public class WhisperCommands
         var processResult = await ffmpeg.ProcessUri(audioStreamInfo.Url);
 
         outputFilename = outputFilename ?? filename;
-        await this.TranscribeAsync(processResult, model, contextFile, parameterFile, defaultSamplingStrategy, false, printTimestamps, outputFormats, outputDirectory, outputFilename, verbose, cancellationToken);
+        await this.TranscribeAsync(processResult, model, contextFile, parameterFile, defaultSamplingStrategy, false, printTimestamps, force, outputFormats, outputDirectory, outputFilename, verbose, cancellationToken);
         File.Delete(processResult);
     }
 
@@ -138,6 +188,7 @@ public class WhisperCommands
 
         var srt = outputFormats.Contains("srt", StringComparer.OrdinalIgnoreCase);
         var vtt = outputFormats.Contains("vtt", StringComparer.OrdinalIgnoreCase);
+        var txt = outputFormats.Contains("txt", StringComparer.OrdinalIgnoreCase);
 
         var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
 
@@ -156,6 +207,13 @@ public class WhisperCommands
             consoleLog.Log($"Writing VTT file: {vttOutputFile}");
             await File.WriteAllTextAsync(vttOutputFile, vttSubtitle.ToString(), cancellationToken);
         }
+
+        if (txt)
+        {
+            var txtOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(jsonFile) + ".txt");
+            consoleLog.Log($"Writing TXT file: {txtOutputFile}");
+            await File.WriteAllTextAsync(txtOutputFile, string.Join("\n", segments.Select(s => s.Text)), cancellationToken);
+        }
     }
 
     /// <summary>Transcribe media file to text.</summary>
@@ -166,6 +224,7 @@ public class WhisperCommands
     /// <param name="defaultSamplingStrategy">-s, Default Sampling Strategy, ignored if parameter file is used.</param>
     /// <param name="transcodeFile">-t, Transcode the file using ffmpeg to a format that Whisper can process. Requires ffmpeg to be installed.</param>
     /// <param name="printTimestamps">-ts, Print timestamps with the text.</param>
+    /// <param name="force">-fo, Force overwrite of existing files.</param>
     /// <param name="outputFormats">-f, Output the text to files.</param>
     /// <param name="outputDirectory">-o, Output directory for the subtitle file, defaults to the current working directory.</param>
     /// <param name="outputFilename">-of, Output file name for the subtitle file, defaults to the name of the media file if available.</param>
@@ -181,6 +240,7 @@ public class WhisperCommands
         SamplingStrategy defaultSamplingStrategy = SamplingStrategy.Greedy,
         bool transcodeFile = true,
         bool printTimestamps = false,
+        bool force = false,
         string[]? outputFormats = default,
         string? outputDirectory = default,
         string? outputFilename = default,
@@ -189,6 +249,38 @@ public class WhisperCommands
     {
         outputFormats = outputFormats ?? new[] { "json" };
         var consoleLog = new ConsoleLog(verbose);
+        var supportOutputFormats = outputFormats?.Length > 0;
+        var enumOutputFormats = outputFormats?.Select(o => Enum.Parse<OutputFormat>(o, true)).ToArray();
+        var srt = enumOutputFormats?.Contains(OutputFormat.SRT) ?? false;
+        var json = enumOutputFormats?.Contains(OutputFormat.Json) ?? false;
+        var vtt = enumOutputFormats?.Contains(OutputFormat.VTT) ?? false;
+        var txt = enumOutputFormats?.Contains(OutputFormat.TXT) ?? false;
+        var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
+
+        if (srt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".srt")) && !force)
+        {
+            consoleLog.LogError("SRT file already exists.");
+            return;
+        }
+
+        if (json && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".json")) && !force)
+        {
+            consoleLog.LogError("JSON file already exists.");
+            return;
+        }
+
+        if (vtt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".vtt")) && !force)
+        {
+            consoleLog.LogError("VTT file already exists.");
+            return;
+        }
+
+        if (txt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".txt")) && !force)
+        {
+            consoleLog.LogError("TXT file already exists.");
+            return;
+        }
+
         this.SetupWhisperLogger(verbose);
         var ffmpeg = new FFMpegTranscodeService(logger: this.SetupLogger("ffmpeg", verbose));
         var contextParams = this.GetContextParams(contextFile);
@@ -246,12 +338,6 @@ public class WhisperCommands
         using var processFileStream = File.OpenRead(processFile);
         var result = processor.ProcessAsync(processFileStream, cancellationToken);
         List<SegmentData>? segments = outputFormats?.Length > 0 ? new() : null;
-        var supportOutputFormats = outputFormats?.Length > 0;
-        var enumOutputFormats = outputFormats?.Select(o => Enum.Parse<OutputFormat>(o, true)).ToArray();
-        var srt = enumOutputFormats?.Contains(OutputFormat.SRT) ?? false;
-        var json = enumOutputFormats?.Contains(OutputFormat.Json) ?? false;
-        var vtt = enumOutputFormats?.Contains(OutputFormat.VTT) ?? false;
-
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
         await foreach (var segment in result)
@@ -285,8 +371,6 @@ public class WhisperCommands
             consoleLog.LogDebug("Media file name is empty, using 'output' as the file name.");
             mediaFileName = "output";
         }
-
-        var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
 
         if (srt && segments != null)
         {
@@ -322,6 +406,17 @@ public class WhisperCommands
         else
         {
             consoleLog.LogDebug("Not writing VTT file.");
+        }
+
+        if (txt && segments != null)
+        {
+            var txtOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".txt");
+            consoleLog.Log($"Writing TXT file: {txtOutputFile}");
+            File.WriteAllText(txtOutputFile, string.Join("\n", segments.Select(s => s.Text)));
+        }
+        else
+        {
+            consoleLog.LogDebug("Not writing TXT file.");
         }
 
         whisperModel.Dispose();

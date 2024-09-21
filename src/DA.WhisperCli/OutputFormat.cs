@@ -23,4 +23,9 @@ public enum OutputFormat
     /// VTT.
     /// </summary>
     VTT,
+
+    /// <summary>
+    /// TXT.
+    /// </summary>
+    TXT,
 }

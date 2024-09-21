@@ -24,6 +24,17 @@
             "stopAtEntry": false
         },
         {
+            "name": "DA.WhisperCli (Transcribe Directory)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/DA.WhisperCli/bin/Debug/net9.0/DA.WhisperCli.dll",
+            "args": ["transcribe", "directory", "${workspaceFolder}/downloads/", "--model", "${workspaceFolder}/model/ggml-medium-q5_0.bin", "-f", "srt, json" ],
+            "cwd": "${workspaceFolder}/src/DA.WhisperCli",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": "DA.WhisperCli (realtime)",
             "type": "coreclr",
             "request": "launch",
