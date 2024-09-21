@@ -159,15 +159,15 @@ macos_release_arm64_model: macos_runtime_verify
 
 linux_core_x64_artifact: linux_core_runtime_verify
 	mkdir -p artifacts/linux-x64-core
-	dotnet build $(WHISPERCLI) -c Release -o artifacts/linux-x64-core -r linux-x64
+	dotnet publish $(WHISPERCLI) -c Release -o artifacts/linux-x64-core -r linux-x64
 
 linux_cuda_x64_artifact: linux_cuda_runtime_verify
 	mkdir -p artifacts/linux-x64-cuda
-	dotnet build $(WHISPERCLI) -p:EnableCuda=true -c Release -o artifacts/linux-x64-cuda
+	dotnet publish $(WHISPERCLI) -p:EnableCuda=true -c Release -o artifacts/linux-x64-cuda
 
 linux_cuda_x64_model: linux_cuda_runtime_verify
 	mkdir -p model
-	dotnet build $(WHISPERCLI) -p:EnableCuda=true -c Release -o model
+	dotnet publish $(WHISPERCLI) -p:EnableCuda=true -c Release -o model
 
 download_tiny_model:
 	mkdir -p model
