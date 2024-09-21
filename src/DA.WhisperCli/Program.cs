@@ -257,9 +257,9 @@ public class WhisperCommands
         var txt = enumOutputFormats?.Contains(OutputFormat.TXT) ?? false;
         var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
         var mediaFileName = outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile);
-        consoleLog.Log($"Media file name: {mediaFileName}");
+        consoleLog.LogDebug($"Media file name: {mediaFileName}");
         var jsonName = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".json");
-        consoleLog.Log($"JSON: {jsonName}");
+        consoleLog.LogDebug($"JSON: {jsonName}");
 
         if (srt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".srt")) && !force)
         {
