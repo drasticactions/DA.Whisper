@@ -256,26 +256,28 @@ public class WhisperCommands
         var vtt = enumOutputFormats?.Contains(OutputFormat.VTT) ?? false;
         var txt = enumOutputFormats?.Contains(OutputFormat.TXT) ?? false;
         var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
+        var mediaFileName = outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile);
+        consoleLog.LogDebug($"Media file name: {mediaFileName}");
 
-        if (srt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".srt")) && !force)
+        if (srt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".srt")) && !force)
         {
             consoleLog.LogError("SRT file already exists.");
             return;
         }
 
-        if (json && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".json")) && !force)
+        if (json && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".json")) && !force)
         {
             consoleLog.LogError("JSON file already exists.");
             return;
         }
 
-        if (vtt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".vtt")) && !force)
+        if (vtt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".vtt")) && !force)
         {
             consoleLog.LogError("VTT file already exists.");
             return;
         }
 
-        if (txt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFile) + ".txt")) && !force)
+        if (txt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".txt")) && !force)
         {
             consoleLog.LogError("TXT file already exists.");
             return;
@@ -364,8 +366,6 @@ public class WhisperCommands
             File.Delete(processFile);
         }
 
-        var mediaFileName = outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile);
-        consoleLog.LogDebug($"Media file name: {mediaFileName}");
         if (string.IsNullOrEmpty(mediaFileName))
         {
             consoleLog.LogDebug("Media file name is empty, using 'output' as the file name.");
