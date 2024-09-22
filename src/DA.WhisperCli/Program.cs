@@ -24,6 +24,9 @@ app.Run(args);
 public class WhisperCommands
 #pragma warning restore SA1649 // File name should match first type name
 {
+    private bool whisperLoggingSet = false;
+    private ConsoleLog? consoleLog;
+
     /// <summary>
     /// Gets the native Whisper system info from the bundled library.
     /// </summary>
@@ -66,17 +69,17 @@ public class WhisperCommands
     {
         extensions = extensions ?? new[] { ".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv", ".wmv", ".mp3", ".wav", ".flac", ".ogg" };
         outputFormats = outputFormats ?? new[] { "json" };
-        var consoleLog = new ConsoleLog(verbose);
+        this.consoleLog = new ConsoleLog(verbose);
         var files = Directory.GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly).Where(f => extensions.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase)).ToList();
         if (files.Count == 0)
         {
-            consoleLog.LogError("No files found.");
+            this.consoleLog.LogError("No files found.");
             return;
         }
 
         foreach (var file in files)
         {
-            consoleLog.Log($"Processing file: {file}");
+            this.consoleLog.Log($"Processing file: {file}");
             await this.TranscribeAsync(file, model, contextFile, parameterFile, defaultSamplingStrategy, true, printTimestamps, force, outputFormats, outputDirectory, outputFilename, verbose, cancellationToken);
         }
     }
@@ -110,23 +113,23 @@ public class WhisperCommands
         bool verbose = false,
         CancellationToken cancellationToken = default)
     {
-        var consoleLog = new ConsoleLog(verbose);
+        this.consoleLog = new ConsoleLog(verbose);
         var ffmpeg = new FFMpegTranscodeService(logger: this.SetupLogger("ffmpeg", verbose));
 
         var ytId = YoutubeExplode.Videos.VideoId.TryParse(youtubeId);
         if (!ytId.HasValue)
         {
-            consoleLog.LogError("Invalid YouTube Id.");
+            this.consoleLog.LogError("Invalid YouTube Id.");
             return;
         }
 
         var youtube = new YoutubeExplode.YoutubeClient();
         var video = await youtube.Videos.GetAsync(ytId.Value);
-        consoleLog.Log($"Processing video: {video.Title}");
+        this.consoleLog.Log($"Processing video: {video.Title}");
         var filename = this.MakeValidFileName(video.Title);
         if (!this.CanWriteFileName(filename))
         {
-            consoleLog.LogError("Unable to write filename.");
+            this.consoleLog.LogError("Unable to write filename.");
             return;
         }
 
@@ -134,14 +137,14 @@ public class WhisperCommands
         var audioStreamInfo = videoStreamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
         if (audioStreamInfo is null)
         {
-            consoleLog.LogError("No audio stream found.");
+            this.consoleLog.LogError("No audio stream found.");
             return;
         }
 
         var audioStream = await youtube.Videos.Streams.GetAsync(audioStreamInfo);
         if (audioStream is null)
         {
-            consoleLog.LogError("Unable to download audio stream.");
+            this.consoleLog.LogError("Unable to download audio stream.");
             return;
         }
 
@@ -248,7 +251,7 @@ public class WhisperCommands
         CancellationToken cancellationToken = default)
     {
         outputFormats = outputFormats ?? new[] { "json" };
-        var consoleLog = new ConsoleLog(verbose);
+        this.consoleLog ??= new ConsoleLog(verbose);
         var supportOutputFormats = outputFormats?.Length > 0;
         var enumOutputFormats = outputFormats?.Select(o => Enum.Parse<OutputFormat>(o, true)).ToArray();
         var srt = enumOutputFormats?.Contains(OutputFormat.SRT) ?? false;
@@ -257,31 +260,31 @@ public class WhisperCommands
         var txt = enumOutputFormats?.Contains(OutputFormat.TXT) ?? false;
         var outputDir = outputDirectory ?? Directory.GetCurrentDirectory();
         var mediaFileName = outputFilename ?? Path.GetFileNameWithoutExtension(mediaFile);
-        consoleLog.LogDebug($"Media file name: {mediaFileName}");
+        this.consoleLog.LogDebug($"Media file name: {mediaFileName}");
         var jsonName = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".json");
-        consoleLog.LogDebug($"JSON: {jsonName}");
+        this.consoleLog.LogDebug($"JSON: {jsonName}");
 
         if (srt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".srt")) && !force)
         {
-            consoleLog.LogError("SRT file already exists.");
+            this.consoleLog.LogError("SRT file already exists.");
             return;
         }
 
         if (json && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".json")) && !force)
         {
-            consoleLog.LogError("JSON file already exists.");
+            this.consoleLog.LogError("JSON file already exists.");
             return;
         }
 
         if (vtt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".vtt")) && !force)
         {
-            consoleLog.LogError("VTT file already exists.");
+            this.consoleLog.LogError("VTT file already exists.");
             return;
         }
 
         if (txt && File.Exists(Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".txt")) && !force)
         {
-            consoleLog.LogError("TXT file already exists.");
+            this.consoleLog.LogError("TXT file already exists.");
             return;
         }
 
@@ -290,32 +293,32 @@ public class WhisperCommands
         var contextParams = this.GetContextParams(contextFile);
         if (contextParams == null)
         {
-            consoleLog.LogError("Unable to load context parameters.");
+            this.consoleLog.LogError("Unable to load context parameters.");
             return;
         }
 
         var fullParams = this.GetFullParams(parameterFile, defaultSamplingStrategy);
         if (fullParams == null)
         {
-            consoleLog.LogError("Unable to load parameters.");
+            this.consoleLog.LogError("Unable to load parameters.");
             return;
         }
 
         if (!WhisperModel.TryFromFileWithParameters(model, contextParams, out WhisperModel? whisperModel) || whisperModel is null)
         {
-            consoleLog.LogError("Unable to load model.");
+            this.consoleLog.LogError("Unable to load model.");
             return;
         }
 
         if (!WhisperProcessor.TryCreateWithParams(whisperModel, fullParams, out WhisperProcessor? processor) || processor is null)
         {
-            consoleLog.LogError("Unable to create processor.");
+            this.consoleLog.LogError("Unable to create processor.");
             return;
         }
 
         if (!File.Exists(mediaFile))
         {
-            consoleLog.LogError("Media file does not exist.");
+            this.consoleLog.LogError("Media file does not exist.");
             return;
         }
 
@@ -334,7 +337,7 @@ public class WhisperCommands
             }
             catch (Exception ex)
             {
-                consoleLog.LogError($"Error transcoding file: {ex.Message}");
+                this.consoleLog.LogError($"Error transcoding file: {ex.Message}");
                 return;
             }
         }
@@ -347,7 +350,7 @@ public class WhisperCommands
         await foreach (var segment in result)
         {
             var text = printTimestamps ? $"[{segment.Start} - {segment.End}] {segment.Text}" : segment.Text;
-            consoleLog.Log(text);
+            this.consoleLog.Log(text);
             segments?.Add(segment);
         }
 
@@ -355,22 +358,22 @@ public class WhisperCommands
 
         if (cancellationToken.IsCancellationRequested)
         {
-            consoleLog.Log("Processing was cancelled.");
+            this.consoleLog.Log("Processing was cancelled.");
             return;
         }
 
-        consoleLog.Log($"Processing took: {stopwatch.Elapsed}");
+        this.consoleLog.Log($"Processing took: {stopwatch.Elapsed}");
 
         if (transcoded)
         {
-            consoleLog.LogDebug($"Deleting transcoded file: {processFile}");
+            this.consoleLog.LogDebug($"Deleting transcoded file: {processFile}");
             await processFileStream.DisposeAsync();
             File.Delete(processFile);
         }
 
         if (string.IsNullOrEmpty(mediaFileName))
         {
-            consoleLog.LogDebug("Media file name is empty, using 'output' as the file name.");
+            this.consoleLog.LogDebug("Media file name is empty, using 'output' as the file name.");
             mediaFileName = "output";
         }
 
@@ -379,46 +382,46 @@ public class WhisperCommands
             var subtitle = Subtitle.FromSegments(segments);
 
             var outputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".srt");
-            consoleLog.Log($"Writing SRT file: {outputFile}");
+            this.consoleLog.Log($"Writing SRT file: {outputFile}");
             File.WriteAllText(outputFile, subtitle.ToString());
         }
         else
         {
-            consoleLog.LogDebug("Not writing SRT file.");
+            this.consoleLog.LogDebug("Not writing SRT file.");
         }
 
         if (json && segments != null)
         {
             var jsonOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".json");
-            consoleLog.Log($"Writing JSON file: {jsonOutputFile}");
+            this.consoleLog.Log($"Writing JSON file: {jsonOutputFile}");
             File.WriteAllText(jsonOutputFile, segments.ToJson());
         }
         else
         {
-            consoleLog.LogDebug("Not writing JSON file.");
+            this.consoleLog.LogDebug("Not writing JSON file.");
         }
 
         if (vtt && segments != null)
         {
             var vttSubtitle = Subtitle.FromSegments(segments, SubtitleType.VTT);
             var vttOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".vtt");
-            consoleLog.Log($"Writing VTT file: {vttOutputFile}");
+            this.consoleLog.Log($"Writing VTT file: {vttOutputFile}");
             File.WriteAllText(vttOutputFile, vttSubtitle.ToString());
         }
         else
         {
-            consoleLog.LogDebug("Not writing VTT file.");
+            this.consoleLog.LogDebug("Not writing VTT file.");
         }
 
         if (txt && segments != null)
         {
             var txtOutputFile = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(mediaFileName) + ".txt");
-            consoleLog.Log($"Writing TXT file: {txtOutputFile}");
+            this.consoleLog.Log($"Writing TXT file: {txtOutputFile}");
             File.WriteAllText(txtOutputFile, string.Join("\n", segments.Select(s => s.Text)));
         }
         else
         {
-            consoleLog.LogDebug("Not writing TXT file.");
+            this.consoleLog.LogDebug("Not writing TXT file.");
         }
 
         whisperModel.Dispose();
@@ -689,6 +692,11 @@ public class WhisperCommands
 
     private void SetupWhisperLogger(bool useConsoleLogger = false)
     {
+        if (this.whisperLoggingSet)
+        {
+            return;
+        }
+
         using var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddDebug();
@@ -719,6 +727,7 @@ public class WhisperCommands
                     break;
             }
         };
+        this.whisperLoggingSet = true;
     }
 
     private Task RecordAudioAsync(Action<byte[]> transcribeAudio, string? deviceName = null, CancellationToken cancellationToken = default)
