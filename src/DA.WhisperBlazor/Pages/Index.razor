@@ -1,6 +1,7 @@
 ﻿@inject IJSRuntime JsRuntime
 @using DA.Whisper;
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Collections.ObjectModel
 
 @page "/"
 
@@ -24,10 +25,21 @@
     <button class="btn btn-primary" @onclick="OnWhisperClick" disabled="@(!canExecute)">Create Transcript</button>
 </div>
 
+<div style="border-style: dotted; border-color: red; border-width: 10px; width: 400px; height: 400px; overflow-y:auto;">
+    @foreach (var item in Segments)
+    {
+        <div class="post">
+            <p class="postText">@item.ToString()</p>
+        </div>
+    }
+</div>
+
 @code
 {
     private IBrowserFile? _selectedModel;
     private IBrowserFile? _selectedAudio;
+
+    private ObservableCollection<SegmentData> Segments = new ObservableCollection<SegmentData>();
 
     private bool isRunning = false;
     private bool canExecute => !isRunning && (_selectedModel is not null && _selectedAudio is not null);
@@ -43,6 +55,7 @@
         isRunning = true;
         try
         {
+            this.Segments.Clear();
             using var modelMemoryStream = new MemoryStream();
             var modelFile = _selectedModel!.OpenReadStream(Int32.MaxValue);
             await modelFile.CopyToAsync(modelMemoryStream);
@@ -61,7 +74,8 @@
             var result = processor.ProcessAsync(memoryStream);
             await foreach (var item in result)
             {
-                Console.WriteLine(item.ToString());
+                Segments.Add(item);
+                Console.WriteLine(item);
             }
         }
         catch
@@ -72,6 +86,8 @@
         {
             isRunning = false;
         }
+
+        this.StateHasChanged();
     }
 
     private void OnHandleModelSelection(InputFileChangeEventArgs e)
