@@ -479,10 +479,12 @@ namespace DA.Whisper
 
     public enum ggml_log_level : uint
     {
-        GGML_LOG_LEVEL_ERROR = 2,
-        GGML_LOG_LEVEL_WARN = 3,
-        GGML_LOG_LEVEL_INFO = 4,
-        GGML_LOG_LEVEL_DEBUG = 5,
+        GGML_LOG_LEVEL_NONE = 0,
+        GGML_LOG_LEVEL_INFO = 1,
+        GGML_LOG_LEVEL_WARN = 2,
+        GGML_LOG_LEVEL_ERROR = 3,
+        GGML_LOG_LEVEL_DEBUG = 4,
+        GGML_LOG_LEVEL_CONT = 5,
     }
 
     public enum whisper_alignment_heads_preset : uint
