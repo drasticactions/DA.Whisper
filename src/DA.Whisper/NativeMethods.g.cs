@@ -60,6 +60,9 @@ namespace DA.Whisper
         [DllImport(__DllName, EntryPoint = "whisper_init_state", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern whisper_state* whisper_init_state(whisper_context* ctx);
 
+        [DllImport(__DllName, EntryPoint = "whisper_ctx_init_openvino_encoder_with_state", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern int whisper_ctx_init_openvino_encoder_with_state(whisper_context* ctx, whisper_state* state, byte* model_path, byte* device, byte* cache_dir);
+
         [DllImport(__DllName, EntryPoint = "whisper_ctx_init_openvino_encoder", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern int whisper_ctx_init_openvino_encoder(whisper_context* ctx, byte* model_path, byte* device, byte* cache_dir);
 
