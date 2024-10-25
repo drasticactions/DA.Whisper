@@ -506,6 +506,7 @@ namespace DA.Whisper
         WHISPER_AHEADS_LARGE_V1 = 11,
         WHISPER_AHEADS_LARGE_V2 = 12,
         WHISPER_AHEADS_LARGE_V3 = 13,
+        WHISPER_AHEADS_LARGE_V3_TURBO = 14,
     }
 
     public enum whisper_gretype : uint
