@@ -65,7 +65,7 @@ linux_x64_core:
 
 linux_x64_cuda:
 	rm -rf build/linux-x64-cuda
-	CUDACXX=/usr/local/cuda/bin/nvcc cmake $(PROJECT_ROOT) $(CMAKE_PARAMETERS) -DWHISPER_CCACHE=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=Release -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_EXAMPLES=OFF -DGGML_CUDA=ON -DGGML_CUDA_F16=ON -DBUILD_SHARED_LIBS=ON -B $(ROOT)/build/linux-x64-cuda
+	CUDACXX=/usr/bin/nvcc cmake $(PROJECT_ROOT) $(CMAKE_PARAMETERS) -DWHISPER_CCACHE=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=Release -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_EXAMPLES=OFF -DGGML_CUDA=ON -DGGML_CUDA_F16=ON -DBUILD_SHARED_LIBS=ON -B $(ROOT)/build/linux-x64-cuda
 	cmake --build build/linux-x64-cuda
 	mkdir -p runtime/linux-x64-cuda
 	cp $(ROOT)/build/linux-x64-cuda/src/libwhisper.so runtime/linux-x64-cuda/libwhisper.so
