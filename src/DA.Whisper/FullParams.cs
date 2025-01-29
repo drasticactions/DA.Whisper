@@ -337,8 +337,8 @@ public class FullParams
     /// </summary>
     public bool SuppressNonSpeechTokens
     {
-        get => this.@params.suppress_non_speech_tokens != FalseByte;
-        set => this.@params.suppress_non_speech_tokens = value ? TrueByte : FalseByte;
+        get => this.@params.suppress_nst != FalseByte;
+        set => this.@params.suppress_nst = value ? TrueByte : FalseByte;
     }
 
     /// <summary>

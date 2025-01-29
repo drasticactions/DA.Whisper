@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 csbindgen = "1.9.3"
-bindgen = "0.69.4"
+bindgen = "0.71.1"

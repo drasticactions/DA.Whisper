@@ -222,6 +222,9 @@ namespace DA.Whisper
         [DllImport(__DllName, EntryPoint = "whisper_token_transcribe", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern int whisper_token_transcribe(whisper_context* ctx);
 
+        [DllImport(__DllName, EntryPoint = "whisper_get_timings", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_timings* whisper_get_timings(whisper_context* ctx);
+
         [DllImport(__DllName, EntryPoint = "whisper_print_timings", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void whisper_print_timings(whisper_context* ctx);
 
@@ -335,6 +338,12 @@ namespace DA.Whisper
         [DllImport(__DllName, EntryPoint = "whisper_log_set", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void whisper_log_set(delegate* unmanaged[Cdecl]<ggml_log_level, byte*, void*, void> log_callback, void* user_data);
 
+        [DllImport(__DllName, EntryPoint = "whisper_full_get_segment_no_speech_prob", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern float whisper_full_get_segment_no_speech_prob(whisper_context* ctx, int i_segment);
+
+        [DllImport(__DllName, EntryPoint = "whisper_full_get_segment_no_speech_prob_from_state", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern float whisper_full_get_segment_no_speech_prob_from_state(whisper_state* state, int i_segment);
+
 
     }
 
@@ -409,6 +418,16 @@ namespace DA.Whisper
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    public unsafe partial struct whisper_timings
+    {
+        public float sample_ms;
+        public float encode_ms;
+        public float decode_ms;
+        public float batchd_ms;
+        public float prompt_ms;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public unsafe partial struct whisper_full_params
     {
         public whisper_sampling_strategy strategy;
@@ -440,7 +459,7 @@ namespace DA.Whisper
         public byte* language;
         [MarshalAs(UnmanagedType.U1)] public byte detect_language;
         [MarshalAs(UnmanagedType.U1)] public byte suppress_blank;
-        [MarshalAs(UnmanagedType.U1)] public byte suppress_non_speech_tokens;
+        [MarshalAs(UnmanagedType.U1)] public byte suppress_nst;
         public float temperature;
         public float max_initial_ts;
         public float length_penalty;
@@ -483,10 +502,10 @@ namespace DA.Whisper
     public enum ggml_log_level : uint
     {
         GGML_LOG_LEVEL_NONE = 0,
-        GGML_LOG_LEVEL_INFO = 1,
-        GGML_LOG_LEVEL_WARN = 2,
-        GGML_LOG_LEVEL_ERROR = 3,
-        GGML_LOG_LEVEL_DEBUG = 4,
+        GGML_LOG_LEVEL_DEBUG = 1,
+        GGML_LOG_LEVEL_INFO = 2,
+        GGML_LOG_LEVEL_WARN = 3,
+        GGML_LOG_LEVEL_ERROR = 4,
         GGML_LOG_LEVEL_CONT = 5,
     }
 
