@@ -79,6 +79,11 @@ macos:
 	cp $(ROOT)/build/macos/bin/ggml-metal.metal runtime/macos/ggml-metal.metal
 	cp $(ROOT)/build/macos/bin/ggml-common.h runtime/macos/ggml-common.h
 	cp $(ROOT)/build/macos/src/libwhisper.dylib runtime/macos/libwhisper.dylib
+	cp $(ROOT)/build/macos/ggml/src/ggml-metal/libggml-metal.dylib runtime/macos/libggml-metal.dylib
+	cp $(ROOT)/build/macos/ggml/src/libggml-base.dylib runtime/macos/llibggml-base.dylib
+	cp $(ROOT)/build/macos/ggml/src/libggml-cpu.dylib runtime/macos/llibggml-cpu.dylib
+	cp $(ROOT)/build/macos/ggml/src/libggml.dylib runtime/macos/llibggml.dylib
+
 
 ios_simulator_x64:
 	rm -rf build/ios-simulator-x64
