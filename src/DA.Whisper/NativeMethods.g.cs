@@ -323,6 +323,49 @@ namespace DA.Whisper
         [DllImport(__DllName, EntryPoint = "whisper_full_get_token_p_from_state", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern float whisper_full_get_token_p_from_state(whisper_state* state, int i_segment, int i_token);
 
+        [DllImport(__DllName, EntryPoint = "whisper_vad_default_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_vad_params whisper_vad_default_params();
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_default_context_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_vad_context_params whisper_vad_default_context_params();
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_init_from_file_with_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_vad_context* whisper_vad_init_from_file_with_params(byte* path_model, whisper_vad_context_params @params);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_init_with_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_vad_context* whisper_vad_init_with_params(whisper_model_loader* loader, whisper_vad_context_params @params);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_detect_speech", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool whisper_vad_detect_speech(whisper_vad_context* vctx, float* samples, int n_samples);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_n_probs", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern int whisper_vad_n_probs(whisper_vad_context* vctx);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_probs", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern float* whisper_vad_probs(whisper_vad_context* vctx);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_segments_from_probs", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_vad_segments* whisper_vad_segments_from_probs(whisper_vad_context* vctx, whisper_vad_params @params);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_segments_from_samples", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern whisper_vad_segments* whisper_vad_segments_from_samples(whisper_vad_context* vctx, whisper_vad_params @params, float* samples, int n_samples);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_segments_n_segments", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern int whisper_vad_segments_n_segments(whisper_vad_segments* segments);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_segments_get_segment_t0", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern float whisper_vad_segments_get_segment_t0(whisper_vad_segments* segments, int i_segment);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_segments_get_segment_t1", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern float whisper_vad_segments_get_segment_t1(whisper_vad_segments* segments, int i_segment);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_free_segments", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void whisper_vad_free_segments(whisper_vad_segments* segments);
+
+        [DllImport(__DllName, EntryPoint = "whisper_vad_free", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void whisper_vad_free(whisper_vad_context* ctx);
+
         [DllImport(__DllName, EntryPoint = "whisper_bench_memcpy", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern int whisper_bench_memcpy(int n_threads);
 
@@ -418,6 +461,17 @@ namespace DA.Whisper
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    public unsafe partial struct whisper_vad_params
+    {
+        public float threshold;
+        public int min_speech_duration_ms;
+        public int min_silence_duration_ms;
+        public float max_speech_duration_s;
+        public int speech_pad_ms;
+        public float samples_overlap;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public unsafe partial struct whisper_timings
     {
         public float sample_ms;
@@ -483,6 +537,9 @@ namespace DA.Whisper
         public nuint n_grammar_rules;
         public nuint i_start_rule;
         public float grammar_penalty;
+        [MarshalAs(UnmanagedType.U1)] public byte vad;
+        public byte* vad_model_path;
+        public whisper_vad_params vad_params;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -496,6 +553,26 @@ namespace DA.Whisper
     {
         public int beam_size;
         public float patience;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe partial struct whisper_vad_context
+    {
+        public fixed byte _unused[1];
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe partial struct whisper_vad_context_params
+    {
+        public int n_threads;
+        [MarshalAs(UnmanagedType.U1)] public byte use_gpu;
+        public int gpu_device;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe partial struct whisper_vad_segments
+    {
+        public fixed byte _unused[1];
     }
 
 
