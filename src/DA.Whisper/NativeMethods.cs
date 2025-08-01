@@ -267,6 +267,7 @@ public static unsafe partial class NativeMethods
             {
                 result[i] = tokens[i];
             }
+
             return result;
         }
     }
