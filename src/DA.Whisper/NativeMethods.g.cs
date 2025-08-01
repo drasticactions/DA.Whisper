@@ -21,6 +21,9 @@ namespace DA.Whisper
 
 
 
+        [DllImport(__DllName, EntryPoint = "whisper_version", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern byte* whisper_version();
+
         [DllImport(__DllName, EntryPoint = "whisper_init_from_file_with_params", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern whisper_context* whisper_init_from_file_with_params(byte* path_model, whisper_context_params @params);
 
